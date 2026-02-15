@@ -74,19 +74,21 @@ const Card = ({ children, className = "", isDark = false, overflowHidden = true 
   </div>
 );
 
+// Updated Label Component: Much larger text and padding
 const Label = ({ icon: Icon, children, isDark = false }) => (
-  <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-lg shadow-sm backdrop-blur-sm mb-3 ${isDark ? 'bg-white/10 border border-white/10' : 'bg-slate-100/80 border border-slate-200/80'}`}>
-    {Icon ? <Icon size={13} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-1.5 h-1.5 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
-    <span className={`text-[10px] font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-200' : 'text-slate-600'}`}>
+  <div className={`inline-flex items-center gap-3 px-4 py-2.5 rounded-xl shadow-sm backdrop-blur-sm mb-5 ${isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100/90 border border-slate-200'}`}>
+    {Icon ? <Icon size={20} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-2 h-2 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
+    <span className={`text-lg md:text-xl font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
       {children}
     </span>
   </div>
 );
 
+// Updated InputGroup: Slightly larger label for better hierarchy
 const InputGroup = ({ label, prefix, suffix, value, onChange, type = "text", inputMode }) => (
   <div className="w-full">
-    {label && <div className="mb-1.5"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p></div>}
-    <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px]">
+    {label && <div className="mb-2"><p className="text-xs font-black text-slate-500 uppercase tracking-widest">{label}</p></div>}
+    <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[50px]">
       {prefix && <span className="text-sm font-bold text-slate-400 mr-2">{prefix}</span>}
       <input 
         type={type}
@@ -108,7 +110,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null); 
   const [showPreset, setShowPreset] = useState(false);
 
-  // Inputs
+  // Inputs Halaman 1
   const [inputs, setInputs] = useState({
     mainVal: "25.000",
     subVal: "0",
@@ -120,6 +122,7 @@ export default function App() {
     mShare: 50
   });
 
+  // Inputs Halaman 3 (Prospect)
   const [histData, setHistData] = useState({
     omset: "50.000.000",
     orders: "1000",
@@ -128,6 +131,8 @@ export default function App() {
   });
   const [growthProj, setGrowthProj] = useState(20);
   const [futureCostPct, setFutureCostPct] = useState(5); 
+
+  // Inputs Halaman 4 (Ads)
   const [adsBudget, setAdsBudget] = useState("30.000"); 
   const [adsType, setAdsType] = useState('keyword'); 
 
@@ -135,11 +140,12 @@ export default function App() {
   const [isEditingAppPrice, setIsEditingAppPrice] = useState(false);
 
   const [cart, setCart] = useState([]);
+  
   const [activeVoucher, setActiveVoucher] = useState(null);
   const [deliveryType, setDeliveryType] = useState('prioritas');
   const [showVoucherDropdown, setShowVoucherDropdown] = useState(false);
 
-  // --- CALCULATION ---
+  // --- CALCULATION CORE ---
   const calc = useMemo(() => {
     const off = pNum(inputs.mainVal);
     const subRaw = pNum(inputs.subVal);
@@ -223,6 +229,7 @@ export default function App() {
   const handleTargetOrderChange = (val) => {
     const rawVal = pNum(val);
     const baseOrders = pNum(histData.orders);
+    
     if (baseOrders > 0) {
        const newGrowth = ((rawVal - baseOrders) / baseOrders) * 100;
        setGrowthProj(newGrowth);
@@ -314,11 +321,11 @@ export default function App() {
       finalOngkir, 
       total, 
       ongkirDisc,
-      totalMerchantCost,
-      schemeKey,
-      limitMin,
-      limitMax,
-      thresholdMet
+      totalMerchantCost, 
+      schemeKey, 
+      limitMin, 
+      limitMax, 
+      thresholdMet 
     };
   }, [cart, activeVoucher, deliveryType, inputs.mShare, inputs.minO, inputs.mDisk, tier]);
 
@@ -479,15 +486,15 @@ export default function App() {
           </div>
         </div>
 
-        <div className="h-[90px] md:h-8"></div>
+        <div className="h-[105px] md:h-8"></div>
 
         <main className="flex-1 p-4 space-y-4 md:p-0">
           
           {/* PAGE 1: CALCULATOR */}
           {page === 'calc' && (
-            <div className="space-y-4">
+            <div className="space-y-4 md:space-y-6 md:scale-[1.02] md:origin-top pb-10">
               {/* Full Width Strategy Card */}
-              <Card isDark={true} className="md:p-5">
+              <Card isDark={true} className="md:p-6 min-h-[200px] flex flex-col justify-center">
                 <Label icon={Tags} isDark={true}>1. Strategi Campaign</Label>
                 <div className="grid grid-cols-4 gap-2 mb-4">
                   {Object.keys(STRATEGY).map(k => {
@@ -545,6 +552,7 @@ export default function App() {
                         </div>
                         <span className="text-xs font-black bg-black/20 px-2 py-0.5 rounded-lg border border-white/10">{inputs.mShare}%</span>
                       </div>
+                      
                       <input 
                         type="range" 
                         min="0" 
@@ -554,6 +562,7 @@ export default function App() {
                         onChange={(e) => setInputs(prev => ({ ...prev, mShare: parseInt(e.target.value) }))}
                         className="w-full h-1.5 bg-blue-900/50 rounded-lg appearance-none cursor-pointer accent-white mb-3"
                       />
+
                       <div className="flex justify-between items-end">
                         <div className="text-left">
                           <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Toko</p>
@@ -574,15 +583,15 @@ export default function App() {
                 
                 {/* Left: Input Menu */}
                 <div className="h-full">
-                   <Card className="h-full md:p-5">
+                   <Card className="h-full md:p-8 md:min-h-[320px] flex flex-col justify-center">
                     <Label icon={List}>2. Input Data Menu</Label>
-                    <div className="flex gap-3 mb-4">
+                    <div className="flex gap-3 mb-6">
                       <div className="flex-1">
                         <InputGroup label="Harga Offline" prefix="Rp" value={inputs.mainVal} onChange={(e) => handleInputChange('mainVal', e.target.value)} />
                       </div>
                       <div className="flex-1">
                         <div className="mb-1.5"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subsidi Toko</p></div>
-                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px]">
+                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[50px]">
                           <input type="text" inputMode="numeric" className="w-full bg-transparent outline-none font-bold text-slate-700 text-base tabular-nums placeholder:text-slate-300" value={inputs.subVal} onChange={(e) => handleInputChange('subVal', e.target.value)} />
                           <div className="flex bg-slate-200/60 rounded-lg p-1 ml-1 shrink-0 gap-1">
                             <button onClick={() => setSubMode('val')} className={`w-6 h-6 flex items-center justify-center text-[8px] font-black rounded transition-all ${subMode === 'val' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>Rp</button>
@@ -593,16 +602,16 @@ export default function App() {
                     </div>
                     <div className="flex gap-2 items-end">
                       <InputGroup value={inputs.menuName} onChange={(e) => handleInputChange('menuName', e.target.value)} inputMode="text" />
-                      <button onClick={addToCart} className="h-[46px] px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-[10px] uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={14} strokeWidth={3}/></button>
+                      <button onClick={addToCart} className="h-[50px] px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-[10px] uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={14} strokeWidth={3}/></button>
                     </div>
                   </Card>
                 </div>
 
                 {/* Right: Config */}
                 <div className="h-full">
-                  <Card className="h-full md:p-5">
+                  <Card className="h-full md:p-8 md:min-h-[320px] flex flex-col justify-center">
                     <Label icon={Settings}>3. Konfigurasi</Label>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                       <InputGroup label="Komisi (%)" value={inputs.kPct} type="number" onChange={(e) => handleInputChange('kPct', e.target.value)} />
                       <InputGroup label="Diskon (%)" value={inputs.vDisk} type="number" onChange={(e) => handleInputChange('vDisk', e.target.value)} />
                       <InputGroup label="Min. Order" value={inputs.minO} onChange={(e) => handleInputChange('minO', e.target.value)} />
@@ -614,263 +623,8 @@ export default function App() {
               </div>
             </div>
           )}
-
-          {/* PAGE 3: PROSPECT - Reorganized Layout */}
-          {page === 'prospect' && (
-            <div className="space-y-6 pb-32">
-               <header className="flex items-center gap-4 pt-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
-                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
-                </header>
-                
-                {/* Row 1: Inputs */}
-                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
-                  <div className="space-y-6">
-                    <Card>
-                      <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
-                      <div className="space-y-4">
-                        <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
-                        <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
-                        <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
-                        <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
-                      </div>
-                    </Card>
-                  </div>
-                  <div className="space-y-6">
-                    <Card>
-                      <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
-                      <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
-                        <div className="flex justify-between items-center mb-4">
-                          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
-                          <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
-                        </div>
-                        <input 
-                          type="range" 
-                          min="0" 
-                          max="200" 
-                          step="5"
-                          value={growthProj} 
-                          onChange={(e) => setGrowthProj(Number(e.target.value))}
-                          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                        />
-                        <div className="mt-6">
-                          <div className="mb-2"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Total Order</p></div>
-                          <div className="bg-white border-2 border-slate-200 rounded-2xl px-4 flex items-center transition-all focus-within:border-emerald-500 focus-within:shadow-md h-[54px]">
-                            <input 
-                              type="text" 
-                              inputMode="numeric"
-                              className="w-full bg-transparent outline-none font-black text-slate-700 text-lg tabular-nums placeholder:text-slate-300"
-                              value={fNum(Math.round(pNum(histData.orders) * (1 + growthProj/100)))} 
-                              onChange={(e) => handleTargetOrderChange(e.target.value)}
-                            />
-                            <span className="text-sm font-bold text-slate-400 ml-2">Order</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-                </div>
-
-                {/* Row 2: Comparison Side-by-Side */}
-                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-4 md:space-y-0">
-                  <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white h-full">
-                      <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
-                      <div className="space-y-5">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
-                          <p className="text-2xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
-                          <p className="text-xl font-black text-white">{fNum(projection.hOrders)} <span className="text-sm text-slate-200 font-bold ml-1">({fNum(projection.hDailyOrders)}/hari)</span></p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
-                          <p className="text-xl font-black text-white">Rp {fNum(projection.hAOV)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
-                          <p className="text-xl font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
-                          <p className="text-xl font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
-                        </div>
-                      </div>
-                  </div>
-
-                  <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30 h-full">
-                      <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-                      <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
-                      <div className="space-y-5 relative z-10">
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
-                          <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
-                          <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-white/90 font-bold ml-1">({fNum(projection.pDailyOrders)}/hari)</span></p>
-                          <p className="text-[8px] text-emerald-300 mt-0.5 font-bold">+{growthProj.toFixed(0)}% dari Historis</p>
-                        </div>
-                        
-                        {/* INPUT FUTURE COST */}
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                             <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
-                          </div>
-                          <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
-                             <input 
-                                type="number" 
-                                value={futureCostPct}
-                                onChange={(e) => setFutureCostPct(e.target.value)}
-                                className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
-                             />
-                             <span className="text-xs font-bold text-emerald-200">%</span>
-                          </div>
-                          <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
-                          <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
-                          <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
-                        </div>
-                      </div>
-                  </div>
-                </div>
-
-                {/* Row 3: Profit Analysis Full Width */}
-                <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
-                  <Label icon={Wallet}>Analisa Profitability</Label>
-                  <div className="grid grid-cols-2 gap-8 mt-4">
-                    <div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
-                      <p className="text-2xl font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
-                      <p className={`text-2xl font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
-                        Rp {fNum(projection.pNet)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Selisih Profit</span>
-                    <span className={`text-3xl font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
-                      {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
-                    </span>
-                  </div>
-                </div>
-            </div>
-          )}
-
-          {/* ... (Keep other pages as is) ... */}
-          {/* PAGE 4: ADS */}
-          {page === 'ads' && (
-            <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0 pb-32">
-              <div className="space-y-6">
-                <header className="flex items-center gap-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
-                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
-                </header>
-
-                <Card>
-                  <Label icon={Megaphone}>Jenis Iklan</Label>
-                  <div className="space-y-4">
-                    <div 
-                      onClick={() => setAdsType('keyword')}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
-                        {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
-                      </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
-                      </p>
-                    </div>
-
-                    <div 
-                      onClick={() => setAdsType('banner')}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
-                        {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
-                      </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card>
-                  <Label icon={Target}>Targeting & Budget</Label>
-                  <div className="space-y-4">
-                    <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
-                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
-                      <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                      <p className="text-[10px] text-blue-700 font-medium">
-                        Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
-                      <Zap size={20} />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6 mb-8">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
-                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
-                      <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
-                        <MousePointer2 size={8} /> Klik
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
-                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
-                        CVR {(adsSim.cvr * 100)}%
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-100">
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
-                      <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                      <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
-                      <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
-                    </div>
-                    <p className="text-[9px] text-slate-400 mt-3 text-center italic">
-                      *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
           
-          {/* ... (Keep Checkout Page as is) ... */}
+          {/* ... (Keep other pages: checkout, prospect, ads as is) ... */}
           {/* PAGE 2: CHECKOUT */}
           {page === 'checkout' && (
             <div className="space-y-6 pb-32">
@@ -1063,6 +817,256 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+              </div>
+            </div>
+          )}
+
+          {/* PAGE 3: PROSPECT */}
+          {page === 'prospect' && (
+            <div className="space-y-6 pb-32">
+               <header className="flex items-center gap-4 pt-4">
+                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
+                    <ChevronLeft size={24} strokeWidth={3}/>
+                  </button>
+                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
+                </header>
+                
+                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
+                  <div className="space-y-6">
+                    <Card>
+                      <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
+                      <div className="space-y-4">
+                        <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
+                        <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
+                        <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
+                        <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
+                      </div>
+                    </Card>
+
+                    <Card>
+                      <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
+                      <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
+                          <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="200" 
+                          step="5"
+                          value={growthProj} 
+                          onChange={(e) => setGrowthProj(Number(e.target.value))}
+                          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        />
+                        <div className="mt-6">
+                          <div className="mb-2"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Total Order</p></div>
+                          <div className="bg-white border-2 border-slate-200 rounded-2xl px-4 flex items-center transition-all focus-within:border-emerald-500 focus-within:shadow-md h-[54px]">
+                            <input 
+                              type="text" 
+                              inputMode="numeric"
+                              className="w-full bg-transparent outline-none font-black text-slate-700 text-lg tabular-nums placeholder:text-slate-300"
+                              value={fNum(Math.round(pNum(histData.orders) * (1 + growthProj/100)))} 
+                              onChange={(e) => handleTargetOrderChange(e.target.value)}
+                            />
+                            <span className="text-sm font-bold text-slate-400 ml-2">Order</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white">
+                      <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
+                      <div className="space-y-5">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
+                          <p className="text-2xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
+                          <p className="text-xl font-black text-white">{fNum(projection.hOrders)} <span className="text-sm text-slate-200 font-bold ml-1">({fNum(projection.hDailyOrders)}/hari)</span></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
+                          <p className="text-xl font-black text-white">Rp {fNum(projection.hAOV)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
+                          <p className="text-xl font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
+                          <p className="text-xl font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30">
+                      <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                      <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
+                      <div className="space-y-5 relative z-10">
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
+                          <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
+                          <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-white/90 font-bold ml-1">({fNum(projection.pDailyOrders)}/hari)</span></p>
+                          <p className="text-[8px] text-emerald-300 mt-0.5 font-bold">+{growthProj.toFixed(0)}% dari Historis</p>
+                        </div>
+                        
+                        {/* INPUT FUTURE COST */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                             <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
+                          </div>
+                          <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
+                             <input 
+                                type="number" 
+                                value={futureCostPct}
+                                onChange={(e) => setFutureCostPct(e.target.value)}
+                                className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
+                             />
+                             <span className="text-xs font-bold text-emerald-200">%</span>
+                          </div>
+                          <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
+                          <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
+                          <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
+                      <Label icon={Wallet}>Analisa Profitability</Label>
+                      <div className="grid grid-cols-2 gap-8 mt-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
+                          <p className="text-lg font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
+                          <p className={`text-lg font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
+                            Rp {fNum(projection.pNet)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Selisih Profit</span>
+                        <span className={`text-sm font-black px-3 py-1 rounded-full ${projection.pNet >= projection.hNet ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                          {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          )}
+
+          {/* PAGE 4: ADS */}
+          {page === 'ads' && (
+            <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0 pb-32">
+              <div className="space-y-6">
+                <header className="flex items-center gap-4">
+                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
+                    <ChevronLeft size={24} strokeWidth={3}/>
+                  </button>
+                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
+                </header>
+
+                <Card>
+                  <Label icon={Megaphone}>Jenis Iklan</Label>
+                  <div className="space-y-4">
+                    <div 
+                      onClick={() => setAdsType('keyword')}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
+                        {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
+                      </p>
+                    </div>
+
+                    <div 
+                      onClick={() => setAdsType('banner')}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
+                        {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card>
+                  <Label icon={Target}>Targeting & Budget</Label>
+                  <div className="space-y-4">
+                    <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
+                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
+                      <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                      <p className="text-[10px] text-blue-700 font-medium">
+                        Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
+                      <Zap size={20} />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
+                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
+                      <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
+                        <MousePointer2 size={8} /> Klik
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
+                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
+                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                        CVR {(adsSim.cvr * 100)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-100">
+                    <div className="flex justify-between items-end mb-2">
+                      <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
+                      <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                      <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
+                      <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
+                    </div>
+                    <p className="text-[9px] text-slate-400 mt-3 text-center italic">
+                      *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
