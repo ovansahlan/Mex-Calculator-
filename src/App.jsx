@@ -69,14 +69,14 @@ const pFloat = (n) => {
 
 // --- COMPONENTS ---
 const Card = ({ children, className = "", isDark = false, overflowHidden = true }) => (
-  <div className={`rounded-[24px] shadow-xl p-6 relative transition-colors duration-300 ${overflowHidden ? 'overflow-hidden' : ''} ${isDark ? 'bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 text-white' : 'bg-white border border-slate-100'} ${className}`}>
+  <div className={`rounded-[20px] shadow-xl p-5 relative transition-colors duration-300 ${overflowHidden ? 'overflow-hidden' : ''} ${isDark ? 'bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 text-white' : 'bg-white border border-slate-100'} ${className}`}>
     {children}
   </div>
 );
 
 const Label = ({ icon: Icon, children, isDark = false }) => (
-  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg shadow-sm backdrop-blur-sm mb-5 ${isDark ? 'bg-white/10 border border-white/10' : 'bg-slate-100/80 border border-slate-200/80'}`}>
-    {Icon ? <Icon size={12} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-1.5 h-1.5 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
+  <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-lg shadow-sm backdrop-blur-sm mb-3 ${isDark ? 'bg-white/10 border border-white/10' : 'bg-slate-100/80 border border-slate-200/80'}`}>
+    {Icon ? <Icon size={13} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-1.5 h-1.5 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
     <span className={`text-[10px] font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-200' : 'text-slate-600'}`}>
       {children}
     </span>
@@ -85,17 +85,17 @@ const Label = ({ icon: Icon, children, isDark = false }) => (
 
 const InputGroup = ({ label, prefix, suffix, value, onChange, type = "text", inputMode }) => (
   <div className="w-full">
-    {label && <div className="mb-2"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p></div>}
-    <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[54px]">
-      {prefix && <span className="text-base font-bold text-slate-400 mr-2">{prefix}</span>}
+    {label && <div className="mb-1.5"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p></div>}
+    <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px]">
+      {prefix && <span className="text-sm font-bold text-slate-400 mr-2">{prefix}</span>}
       <input 
         type={type}
         inputMode={inputMode || (type === 'number' ? 'decimal' : 'numeric')}
-        className="w-full bg-transparent outline-none font-bold text-slate-600 text-lg tabular-nums placeholder:text-slate-300"
+        className="w-full bg-transparent outline-none font-bold text-slate-700 text-base tabular-nums placeholder:text-slate-300"
         value={value}
         onChange={onChange}
       />
-      {suffix && <span className="text-sm font-bold text-slate-400 ml-2">{suffix}</span>}
+      {suffix && <span className="text-xs font-bold text-slate-400 ml-2">{suffix}</span>}
     </div>
   </div>
 );
@@ -220,6 +220,15 @@ export default function App() {
     setInputs(prev => ({ ...prev, mainVal: fNum(newOff) }));
   };
 
+  const handleTargetOrderChange = (val) => {
+    const rawVal = pNum(val);
+    const baseOrders = pNum(histData.orders);
+    if (baseOrders > 0) {
+       const newGrowth = ((rawVal - baseOrders) / baseOrders) * 100;
+       setGrowthProj(newGrowth);
+    }
+  };
+
   const addToCart = () => {
     const priceToCart = pNum(isEditingAppPrice ? localAppPrice : calc.list);
     const newItem = { 
@@ -272,6 +281,7 @@ export default function App() {
     if (activeVoucher) {
       schemeKey = activeVoucher.scheme;
       const conf = STRATEGY[schemeKey];
+
       if (conf.tiers && conf.tiers[tier]) {
         limitMin = conf.tiers[tier].min;
         limitMax = conf.tiers[tier].max;
@@ -279,9 +289,11 @@ export default function App() {
         limitMin = pNum(inputs.minO);
         limitMax = pNum(inputs.mDisk) || Infinity;
       }
+
       if (subtotal >= limitMin) {
         const rawDisc = Math.round(subtotal * (activeVoucher.disc / 100));
         totalPotDisc = Math.min(rawDisc, limitMax);
+
         if (schemeKey === 'cofund') {
           const sharePct = inputs.mShare;
           totalMerchantCost = Math.round(totalPotDisc * (sharePct / 100));
@@ -297,8 +309,16 @@ export default function App() {
     const total = subtotal - totalPotDisc + finalOngkir + 1500;
 
     return { 
-      subtotal, finalDisc: totalPotDisc, finalOngkir, total, ongkirDisc,
-      totalMerchantCost, schemeKey, limitMin, limitMax, thresholdMet
+      subtotal, 
+      finalDisc: totalPotDisc, 
+      finalOngkir, 
+      total, 
+      ongkirDisc,
+      totalMerchantCost,
+      schemeKey,
+      limitMin,
+      limitMax,
+      thresholdMet
     };
   }, [cart, activeVoucher, deliveryType, inputs.mShare, inputs.minO, inputs.mDisk, tier]);
 
@@ -307,6 +327,7 @@ export default function App() {
     const hOrders = pNum(histData.orders);
     const hAOV = pNum(histData.aov);
     const hInvestPct = pFloat(histData.invest); 
+    
     const hDailyOrders = hOrders > 0 ? Math.round(hOrders / 30) : 0;
     const hInvestAmount = Math.round(hOmset * (hInvestPct / 100));
     const hNet = hOmset - hInvestAmount;
@@ -405,16 +426,16 @@ export default function App() {
           </div>
         )}
 
-        {/* DASHBOARD HEADER - SPLIT 3 PANELS */}
+        {/* DASHBOARD HEADER */}
         <div className="fixed top-0 left-0 right-0 z-50 p-3 bg-gradient-to-b from-[#002a14]/90 to-transparent md:relative md:bg-none md:p-0 md:mt-4 md:mx-auto md:w-full">
           <div className="grid grid-cols-3 gap-2 md:gap-4 md:max-w-5xl">
             {/* Panel 1: App Price */}
-            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] relative group">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] relative group">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                 App Price <Edit3 size={10} className="text-slate-300"/>
               </p>
               <input 
-                className="w-full bg-transparent border-none text-center outline-none font-black text-xl md:text-2xl text-slate-800 tabular-nums p-0 placeholder:text-slate-300"
+                className="w-full bg-transparent border-none text-center outline-none font-black text-2xl text-slate-800 tabular-nums p-0 placeholder:text-slate-300"
                 value={isEditingAppPrice ? localAppPrice : fNum(calc.list)}
                 onChange={(e) => handleAppPriceManual(e.target.value)}
                 onFocus={() => { setIsEditingAppPrice(true); setLocalAppPrice(fNum(calc.list)); }}
@@ -426,13 +447,13 @@ export default function App() {
 
             {/* Panel 2: Pax Pays */}
             <div 
-              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] cursor-pointer hover:scale-[1.02] transition-transform" 
               onClick={() => setActiveModal('cust')}
             >
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Pax Pays</p>
               {calc.list > calc.pay ? (
                 <div className="flex flex-col items-center leading-none">
-                   <span className="text-[10px] text-slate-400 line-through decoration-slate-300 font-bold mb-0.5">
+                   <span className="text-[10px] text-slate-300 line-through decoration-slate-300 font-bold mb-0.5">
                      Rp {fNum(calc.list)}
                    </span>
                    <span className="font-black text-lg md:text-xl text-emerald-600 tabular-nums">
@@ -448,7 +469,7 @@ export default function App() {
 
             {/* Panel 3: Net Rev */}
             <div 
-              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] cursor-pointer hover:scale-[1.02] transition-transform" 
               onClick={() => setActiveModal('net')}
             >
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Rev</p>
@@ -458,138 +479,398 @@ export default function App() {
           </div>
         </div>
 
-        {/* SPACER FOR FIXED HEADER */}
-        <div className="h-[105px] md:h-8"></div>
+        <div className="h-[90px] md:h-8"></div>
 
-        <main className="flex-1 p-5 space-y-8 md:p-0">
+        <main className="flex-1 p-4 space-y-4 md:p-0">
           
           {/* PAGE 1: CALCULATOR */}
           {page === 'calc' && (
-            <div className="space-y-8 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
-              <div className="space-y-8">
-                <Card isDark={true}>
-                  <Label icon={Tags} isDark={true}>1. Strategi Campaign</Label>
-                  <div className="grid grid-cols-4 gap-2 mb-6">
-                    {Object.keys(STRATEGY).map(k => {
-                      const isSpecial = (k === 'puas-cuan' || k === 'booster');
-                      const isActive = scheme === k;
-                      return (
-                        <button 
-                          key={k} 
-                          onClick={() => setScheme(k)} 
-                          className={`
-                            py-3.5 rounded-2xl text-[10px] font-black uppercase transition-all duration-200 border-2 relative
-                            ${isActive 
-                              ? 'bg-[#FFD200] border-[#FFD200] text-slate-900 shadow-md transform scale-105' 
-                              : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white hover:border-white/30'
-                            }
-                            ${(isSpecial && isActive) ? 'animate-glow' : ''}
-                          `}
-                        >
-                          {k === 'normal' ? 'Norm' : k === 'puas-cuan' ? 'Cuan' : k === 'booster' ? 'Boost' : 'CoFund'}
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  <div className="h-px bg-white/10 w-full my-5"></div>
-
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1 pr-2">
-                      <h2 className="font-black text-2xl text-white tracking-tight italic mb-3">{STRATEGY[scheme].title}</h2>
-                      <div className="flex flex-col gap-3">
-                        {STRATEGY[scheme].benefits.map((b, i) => (
-                          <div key={i} className="flex items-start gap-3">
-                            <div className="bg-emerald-500/20 text-emerald-400 rounded-full p-0.5 mt-0.5 shrink-0"><Check size={12} strokeWidth={4}/></div>
-                            <span className="text-sm font-bold text-slate-300 leading-snug">{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {STRATEGY[scheme].tiers && (
-                      <div className="flex bg-black/20 p-1.5 rounded-xl border border-white/5 shadow-inner">
-                        {['hemat', 'ekstra'].map(t => (
-                          <button key={t} onClick={() => setTier(t)} className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${tier === t ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>{t}</button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {scheme === 'cofund' && (
-                    <div className="mt-6 pt-4 border-t border-white/10">
-                      <button onClick={() => setShowPreset(!showPreset)} className="w-full bg-white/5 hover:bg-white/10 border-2 border-white/10 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-300 transition-colors">
-                        <span>{showPreset ? 'Tutup Pilihan' : 'Pilih Database Promo...'}</span>
-                        <ArrowRight size={14} className={`transition-transform ${showPreset ? 'rotate-90' : ''}`} />
+            <div className="space-y-4">
+              {/* Full Width Strategy Card */}
+              <Card isDark={true} className="md:p-5">
+                <Label icon={Tags} isDark={true}>1. Strategi Campaign</Label>
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                  {Object.keys(STRATEGY).map(k => {
+                    const isSpecial = (k === 'puas-cuan' || k === 'booster');
+                    const isActive = scheme === k;
+                    return (
+                      <button 
+                        key={k} 
+                        onClick={() => setScheme(k)} 
+                        className={`
+                          py-2.5 rounded-xl text-xs font-black uppercase transition-all duration-200 border-2 relative
+                          ${isActive 
+                            ? 'bg-[#FFD200] border-[#FFD200] text-slate-900 shadow-md transform scale-105' 
+                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white hover:border-white/30'
+                          }
+                          ${(isSpecial && isActive) ? 'animate-glow' : ''}
+                        `}
+                      >
+                        {k === 'normal' ? 'Norm' : k === 'puas-cuan' ? 'Cuan' : k === 'booster' ? 'Boost' : 'CoFund'}
                       </button>
-                      {showPreset && (
-                        <div className="mt-2 bg-[#1e293b] border border-white/10 rounded-2xl overflow-hidden shadow-xl mb-4 animate-in slide-in-from-top-2">
-                          {PRESETS.map((p, i) => (
-                            <div key={i} className="p-4 hover:bg-white/5 cursor-pointer text-xs font-bold text-slate-300 border-b border-white/5 last:border-0"
-                              onClick={() => { setInputs(prev => ({ ...prev, vDisk: p.v, mShare: p.s, minO: fNum(p.min), mDisk: fNum(p.max) })); setShowPreset(false); }}>
-                              {p.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div className="bg-blue-600/90 backdrop-blur-md rounded-2xl p-5 text-white shadow-xl mt-3 border border-blue-500/30">
-                        <div className="flex justify-between items-end">
-                          <div className="text-left bg-black/20 px-3 py-2 rounded-lg border border-white/5">
-                            <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Toko</p>
-                            <p className="font-black text-sm">Rp {fNum(calc.mPromoCost)}</p>
-                          </div>
-                          <div className="text-right bg-black/20 px-3 py-2 rounded-lg border border-white/5">
-                            <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Grab</p>
-                            <p className="font-black text-sm text-[#FFD200]">Rp {fNum(calc.totalDisc - calc.mPromoCost)}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
+                    )
+                  })}
+                </div>
 
-                <Card>
-                  <Label icon={List}>2. Input Data Menu</Label>
-                  <div className="flex gap-4 mb-5">
-                    <div className="flex-1">
-                      <InputGroup label="Harga Offline" prefix="Rp" value={inputs.mainVal} onChange={(e) => handleInputChange('mainVal', e.target.value)} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="mb-2"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subsidi Toko</p></div>
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl pl-4 pr-1.5 py-1.5 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[54px]">
-                        <input type="text" inputMode="numeric" className="w-full bg-transparent outline-none font-bold text-slate-600 text-lg tabular-nums placeholder:text-slate-300" value={inputs.subVal} onChange={(e) => handleInputChange('subVal', e.target.value)} />
-                        <div className="flex bg-slate-200/60 rounded-xl p-1 ml-1 shrink-0">
-                          <button onClick={() => setSubMode('val')} className={`w-8 h-8 flex items-center justify-center text-[9px] font-black rounded-lg transition-all ${subMode === 'val' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>Rp</button>
-                          <button onClick={() => setSubMode('pct')} className={`w-8 h-8 flex items-center justify-center text-[9px] font-black rounded-lg transition-all ${subMode === 'pct' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>%</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 items-end">
-                    <InputGroup value={inputs.menuName} onChange={(e) => handleInputChange('menuName', e.target.value)} inputMode="text" />
-                    <button onClick={addToCart} className="h-[54px] px-8 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={18} strokeWidth={3}/></button>
-                  </div>
-                </Card>
-              </div>
+                <div className="h-px bg-white/10 w-full my-3"></div>
 
-              <div className="space-y-8 md:mt-0">
-                <Card>
-                  <Label icon={Settings}>3. Konfigurasi</Label>
-                  <div className="grid grid-cols-2 gap-x-5 gap-y-5">
-                    <InputGroup label="Komisi (%)" value={inputs.kPct} type="number" onChange={(e) => handleInputChange('kPct', e.target.value)} />
-                    <InputGroup label="Diskon (%)" value={inputs.vDisk} type="number" onChange={(e) => handleInputChange('vDisk', e.target.value)} />
-                    <InputGroup label="Min. Order" value={inputs.minO} onChange={(e) => handleInputChange('minO', e.target.value)} />
-                    <InputGroup label="Max. Disk" value={inputs.mDisk} onChange={(e) => handleInputChange('mDisk', e.target.value)} />
-                    {scheme === 'cofund' && (
-                      <div className="col-span-2">
-                        <InputGroup label="Mex Promo Share (%)" value={inputs.mShare} type="number" onChange={(e) => handleInputChange('mShare', e.target.value)} />
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                  <div className="flex-1">
+                    <h2 className="font-black text-xl text-white tracking-tight italic mb-2">{STRATEGY[scheme].title}</h2>
+                    {STRATEGY[scheme].tiers && (
+                      <div className="flex bg-black/20 p-1 rounded-lg border border-white/5 shadow-inner self-start mb-2 md:mb-0 md:float-right">
+                        {['hemat', 'ekstra'].map(t => (
+                          <button key={t} onClick={() => setTier(t)} className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase transition-all ${tier === t ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>{t}</button>
+                        ))}
                       </div>
                     )}
+                    <div className="flex flex-col gap-2">
+                      {STRATEGY[scheme].benefits.map((b, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <div className="bg-emerald-500/20 text-emerald-400 rounded-full p-0.5 mt-0.5 shrink-0"><Check size={10} strokeWidth={4}/></div>
+                          <span className="text-xs font-bold text-slate-200 leading-snug">{b}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </Card>
+                </div>
+
+                {scheme === 'cofund' && (
+                  <div className="mt-4 pt-3 border-t border-white/10">
+                    <div className="bg-blue-600/90 backdrop-blur-md rounded-xl p-4 text-white shadow-lg border border-blue-500/30">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-2">
+                          <Users2 size={14} className="text-blue-200" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-100">Mex Promo Share</span>
+                        </div>
+                        <span className="text-xs font-black bg-black/20 px-2 py-0.5 rounded-lg border border-white/10">{inputs.mShare}%</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        step="5" 
+                        value={inputs.mShare}
+                        onChange={(e) => setInputs(prev => ({ ...prev, mShare: parseInt(e.target.value) }))}
+                        className="w-full h-1.5 bg-blue-900/50 rounded-lg appearance-none cursor-pointer accent-white mb-3"
+                      />
+                      <div className="flex justify-between items-end">
+                        <div className="text-left">
+                          <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Toko</p>
+                          <p className="font-black text-sm">Rp {fNum(calc.mPromoCost)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Grab</p>
+                          <p className="font-black text-sm text-[#FFD200]">Rp {fNum(calc.totalDisc - calc.mPromoCost)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              {/* Side-by-Side Inputs */}
+              <div className="md:grid md:grid-cols-2 md:gap-4 space-y-4 md:space-y-0">
+                
+                {/* Left: Input Menu */}
+                <div className="h-full">
+                   <Card className="h-full md:p-5">
+                    <Label icon={List}>2. Input Data Menu</Label>
+                    <div className="flex gap-3 mb-4">
+                      <div className="flex-1">
+                        <InputGroup label="Harga Offline" prefix="Rp" value={inputs.mainVal} onChange={(e) => handleInputChange('mainVal', e.target.value)} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="mb-1.5"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subsidi Toko</p></div>
+                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px]">
+                          <input type="text" inputMode="numeric" className="w-full bg-transparent outline-none font-bold text-slate-700 text-base tabular-nums placeholder:text-slate-300" value={inputs.subVal} onChange={(e) => handleInputChange('subVal', e.target.value)} />
+                          <div className="flex bg-slate-200/60 rounded-lg p-1 ml-1 shrink-0 gap-1">
+                            <button onClick={() => setSubMode('val')} className={`w-6 h-6 flex items-center justify-center text-[8px] font-black rounded transition-all ${subMode === 'val' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>Rp</button>
+                            <button onClick={() => setSubMode('pct')} className={`w-6 h-6 flex items-center justify-center text-[8px] font-black rounded transition-all ${subMode === 'pct' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>%</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 items-end">
+                      <InputGroup value={inputs.menuName} onChange={(e) => handleInputChange('menuName', e.target.value)} inputMode="text" />
+                      <button onClick={addToCart} className="h-[46px] px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-[10px] uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={14} strokeWidth={3}/></button>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Right: Config */}
+                <div className="h-full">
+                  <Card className="h-full md:p-5">
+                    <Label icon={Settings}>3. Konfigurasi</Label>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                      <InputGroup label="Komisi (%)" value={inputs.kPct} type="number" onChange={(e) => handleInputChange('kPct', e.target.value)} />
+                      <InputGroup label="Diskon (%)" value={inputs.vDisk} type="number" onChange={(e) => handleInputChange('vDisk', e.target.value)} />
+                      <InputGroup label="Min. Order" value={inputs.minO} onChange={(e) => handleInputChange('minO', e.target.value)} />
+                      <InputGroup label="Max. Disk" value={inputs.mDisk} onChange={(e) => handleInputChange('mDisk', e.target.value)} />
+                    </div>
+                  </Card>
+                </div>
+
               </div>
             </div>
           )}
 
+          {/* PAGE 3: PROSPECT - Reorganized Layout */}
+          {page === 'prospect' && (
+            <div className="space-y-6 pb-32">
+               <header className="flex items-center gap-4 pt-4">
+                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
+                    <ChevronLeft size={24} strokeWidth={3}/>
+                  </button>
+                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
+                </header>
+                
+                {/* Row 1: Inputs */}
+                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
+                  <div className="space-y-6">
+                    <Card>
+                      <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
+                      <div className="space-y-4">
+                        <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
+                        <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
+                        <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
+                        <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
+                      </div>
+                    </Card>
+                  </div>
+                  <div className="space-y-6">
+                    <Card>
+                      <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
+                      <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
+                          <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="200" 
+                          step="5"
+                          value={growthProj} 
+                          onChange={(e) => setGrowthProj(Number(e.target.value))}
+                          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        />
+                        <div className="mt-6">
+                          <div className="mb-2"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Total Order</p></div>
+                          <div className="bg-white border-2 border-slate-200 rounded-2xl px-4 flex items-center transition-all focus-within:border-emerald-500 focus-within:shadow-md h-[54px]">
+                            <input 
+                              type="text" 
+                              inputMode="numeric"
+                              className="w-full bg-transparent outline-none font-black text-slate-700 text-lg tabular-nums placeholder:text-slate-300"
+                              value={fNum(Math.round(pNum(histData.orders) * (1 + growthProj/100)))} 
+                              onChange={(e) => handleTargetOrderChange(e.target.value)}
+                            />
+                            <span className="text-sm font-bold text-slate-400 ml-2">Order</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Row 2: Comparison Side-by-Side */}
+                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-4 md:space-y-0">
+                  <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white h-full">
+                      <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
+                      <div className="space-y-5">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
+                          <p className="text-2xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
+                          <p className="text-xl font-black text-white">{fNum(projection.hOrders)} <span className="text-sm text-slate-200 font-bold ml-1">({fNum(projection.hDailyOrders)}/hari)</span></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
+                          <p className="text-xl font-black text-white">Rp {fNum(projection.hAOV)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
+                          <p className="text-xl font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
+                          <p className="text-xl font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
+                        </div>
+                      </div>
+                  </div>
+
+                  <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30 h-full">
+                      <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                      <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
+                      <div className="space-y-5 relative z-10">
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
+                          <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
+                          <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-white/90 font-bold ml-1">({fNum(projection.pDailyOrders)}/hari)</span></p>
+                          <p className="text-[8px] text-emerald-300 mt-0.5 font-bold">+{growthProj.toFixed(0)}% dari Historis</p>
+                        </div>
+                        
+                        {/* INPUT FUTURE COST */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                             <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
+                          </div>
+                          <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
+                             <input 
+                                type="number" 
+                                value={futureCostPct}
+                                onChange={(e) => setFutureCostPct(e.target.value)}
+                                className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
+                             />
+                             <span className="text-xs font-bold text-emerald-200">%</span>
+                          </div>
+                          <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
+                          <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
+                          <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+
+                {/* Row 3: Profit Analysis Full Width */}
+                <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
+                  <Label icon={Wallet}>Analisa Profitability</Label>
+                  <div className="grid grid-cols-2 gap-8 mt-4">
+                    <div>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
+                      <p className="text-2xl font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
+                      <p className={`text-2xl font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
+                        Rp {fNum(projection.pNet)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Selisih Profit</span>
+                    <span className={`text-3xl font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
+                      {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
+                    </span>
+                  </div>
+                </div>
+            </div>
+          )}
+
+          {/* ... (Keep other pages as is) ... */}
+          {/* PAGE 4: ADS */}
+          {page === 'ads' && (
+            <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0 pb-32">
+              <div className="space-y-6">
+                <header className="flex items-center gap-4">
+                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
+                    <ChevronLeft size={24} strokeWidth={3}/>
+                  </button>
+                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
+                </header>
+
+                <Card>
+                  <Label icon={Megaphone}>Jenis Iklan</Label>
+                  <div className="space-y-4">
+                    <div 
+                      onClick={() => setAdsType('keyword')}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
+                        {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
+                      </p>
+                    </div>
+
+                    <div 
+                      onClick={() => setAdsType('banner')}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
+                        {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card>
+                  <Label icon={Target}>Targeting & Budget</Label>
+                  <div className="space-y-4">
+                    <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
+                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
+                      <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                      <p className="text-[10px] text-blue-700 font-medium">
+                        Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
+                      <Zap size={20} />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
+                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
+                      <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
+                        <MousePointer2 size={8} /> Klik
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
+                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
+                      <p className="text-[9px] text-slate-400 font-bold mt-1">
+                        CVR {(adsSim.cvr * 100)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-100">
+                    <div className="flex justify-between items-end mb-2">
+                      <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
+                      <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                      <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
+                      <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
+                    </div>
+                    <p className="text-[9px] text-slate-400 mt-3 text-center italic">
+                      *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* ... (Keep Checkout Page as is) ... */}
           {/* PAGE 2: CHECKOUT */}
           {page === 'checkout' && (
             <div className="space-y-6 pb-32">
@@ -782,246 +1063,6 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 3: PROSPECT */}
-          {page === 'prospect' && (
-            <div className="space-y-6 pb-32">
-              <header className="flex items-center gap-4 pt-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
-                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
-              </header>
-
-              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
-                <div className="space-y-6">
-                  <Card>
-                    <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
-                    <div className="space-y-4">
-                      <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
-                      <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
-                      <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
-                      <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
-                    </div>
-                  </Card>
-
-                  <Card>
-                    <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
-                    <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
-                        <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
-                      </div>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="200" 
-                        step="5"
-                        value={growthProj} 
-                        onChange={(e) => setGrowthProj(Number(e.target.value))}
-                        className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                      />
-                      <p className="text-[10px] text-slate-400 font-medium mt-3 text-center">Geser untuk simulasi kenaikan order</p>
-                    </div>
-                  </Card>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white">
-                    <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
-                    <div className="space-y-5">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
-                        <p className="text-2xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
-                        <p className="text-xl font-black text-white">{fNum(projection.hOrders)} <span className="text-sm text-slate-200 font-bold ml-1">({fNum(projection.hDailyOrders)}/hari)</span></p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
-                        <p className="text-xl font-black text-white">Rp {fNum(projection.hAOV)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
-                        <p className="text-xl font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
-                        <p className="text-xl font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30">
-                    <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-                    <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
-                    <div className="space-y-5 relative z-10">
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
-                        <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
-                        <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-white/90 font-bold ml-1">({fNum(projection.pDailyOrders)}/hari)</span></p>
-                        <p className="text-[8px] text-emerald-300 mt-0.5 font-bold">+{growthProj}% dari Historis</p>
-                      </div>
-                      
-                      {/* INPUT FUTURE COST */}
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                           <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
-                        </div>
-                        <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
-                           <input 
-                              type="number" 
-                              value={futureCostPct}
-                              onChange={(e) => setFutureCostPct(e.target.value)}
-                              className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
-                           />
-                           <span className="text-xs font-bold text-emerald-200">%</span>
-                        </div>
-                        <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
-                        <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
-                        <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
-                    <Label icon={Wallet}>Analisa Profitability</Label>
-                    <div className="grid grid-cols-2 gap-8 mt-2">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
-                        <p className="text-lg font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
-                        <p className={`text-lg font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
-                          Rp {fNum(projection.pNet)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Selisih Profit</span>
-                      <span className={`text-sm font-black px-3 py-1 rounded-full ${projection.pNet >= projection.hNet ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                        {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 4: ADS */}
-          {page === 'ads' && (
-            <div className="space-y-6 pb-32">
-              <header className="flex items-center gap-4 pt-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
-                  <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
-                </header>
-
-              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
-                <div className="space-y-6">
-                  <Card>
-                    <Label icon={Megaphone}>Jenis Iklan</Label>
-                    <div className="space-y-4">
-                      <div 
-                        onClick={() => setAdsType('keyword')}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
-                          {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
-                        </div>
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                          Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
-                        </p>
-                      </div>
-
-                      <div 
-                        onClick={() => setAdsType('banner')}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
-                          {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
-                        </div>
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                          Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card>
-                    <Label icon={Target}>Targeting & Budget</Label>
-                    <div className="space-y-4">
-                      <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
-                      <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
-                        <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                        <p className="text-[10px] text-blue-700 font-medium">
-                          Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
-                    <div className="flex items-center gap-2 mb-6">
-                      <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
-                        <Zap size={20} />
-                      </div>
-                      <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-6 mb-8">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
-                        <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
-                        <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
-                          <MousePointer2 size={8} /> Klik
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
-                        <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
-                        <p className="text-[9px] text-slate-400 font-bold mt-1">
-                          CVR {(adsSim.cvr * 100)}%
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-slate-100">
-                      <div className="flex justify-between items-end mb-2">
-                        <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
-                        <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                        <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
-                        <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
-                      </div>
-                      <p className="text-[9px] text-slate-400 mt-3 text-center italic">
-                        *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )}
