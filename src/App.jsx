@@ -24,13 +24,13 @@ import {
 const STRATEGY = {
   'normal': { k: 20, v: 0, tiers: null, title: 'NORMAL', benefits: ['Margin Aman 100%', 'Kestabilan Brand Jangka Panjang'] },
   'puas-cuan': { k: 32, v: 30, tiers: { hemat: { max: 45000, min: 15000 }, ekstra: { max: 80000, min: 35000 } }, title: 'CUAN 32%', benefits: ['Diskon Didukung Grab', 'Volume Penjualan Meningkat Drastis'] },
-  'booster': { k: 38, v: 35, tiers: { hemat: { max: 55000, min: 15000 }, ekstra: { max: 100000, min: 35000 } }, title: 'BOOSTER 38%', benefits: ['Prioritas Pencarian Utama', 'Slot Banner Flash Sale Eksklusif'] },
+  'booster': { k: 38, v: 35, tiers: { hemat: { max: 55000, min: 15000 }, ekstra: { max: 100000, min: 35000 } }, title: 'BOOSTER 38%', benefits: ['Include Flash Sale 50-55%', 'Slot Banner Flash Sale Eksklusif'] },
   'cofund': { k: 20, v: 40, tiers: null, title: 'COFUND', benefits: ['Sharing Cost Promo', 'Akses ke Pengguna Baru'] }
 };
 
 const PRESETS = [
-  { name: "Brand Week", v: 45, s: 55, min: 50000, max: 50000 },
-  { name: "Flash Sale", v: 50, s: 60, min: 64000, max: 40000 }
+  { name: "Brand Week Festival 45%", v: 45, s: 55, min: 50000, max: 50000 },
+  { name: "Flash Sale 50%", v: 50, s: 60, min: 64000, max: 40000 }
 ];
 
 // --- UTILS ---
