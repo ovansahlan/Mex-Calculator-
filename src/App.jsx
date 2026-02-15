@@ -67,37 +67,37 @@ const pFloat = (n) => {
   return parseFloat(cleanStr) || 0;
 };
 
-// --- COMPONENTS ---
+// --- COMPONENTS (SCALED FOR DESKTOP) ---
+
 const Card = ({ children, className = "", isDark = false, overflowHidden = true }) => (
-  <div className={`rounded-[20px] shadow-xl p-5 relative transition-colors duration-300 ${overflowHidden ? 'overflow-hidden' : ''} ${isDark ? 'bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 text-white' : 'bg-white border border-slate-100'} ${className}`}>
+  <div className={`rounded-[20px] md:rounded-[32px] shadow-xl p-5 md:p-8 relative transition-colors duration-300 ${overflowHidden ? 'overflow-hidden' : ''} ${isDark ? 'bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 text-white' : 'bg-white border border-slate-100'} ${className}`}>
     {children}
   </div>
 );
 
-// Updated Label Component: Much larger text and padding
 const Label = ({ icon: Icon, children, isDark = false }) => (
-  <div className={`inline-flex items-center gap-3 px-4 py-2.5 rounded-xl shadow-sm backdrop-blur-sm mb-5 ${isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100/90 border border-slate-200'}`}>
-    {Icon ? <Icon size={20} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-2 h-2 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
-    <span className={`text-lg md:text-xl font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
+  <div className={`inline-flex items-center gap-2 md:gap-3 px-2.5 md:px-5 py-1 md:py-2.5 rounded-lg md:rounded-xl shadow-sm backdrop-blur-sm mb-3 md:mb-6 ${isDark ? 'bg-white/10 border border-white/10' : 'bg-slate-100/80 border border-slate-200/80'}`}>
+    {Icon ? <Icon size={16} className={`md:w-6 md:h-6 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} /> : <div className={`w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
+    <span className={`text-[10px] md:text-base font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-200' : 'text-slate-600'}`}>
       {children}
     </span>
   </div>
 );
 
-// Updated InputGroup: Slightly larger label for better hierarchy
 const InputGroup = ({ label, prefix, suffix, value, onChange, type = "text", inputMode }) => (
   <div className="w-full">
-    {label && <div className="mb-2"><p className="text-xs font-black text-slate-500 uppercase tracking-widest">{label}</p></div>}
-    <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[50px]">
-      {prefix && <span className="text-sm font-bold text-slate-400 mr-2">{prefix}</span>}
+    {label && <div className="mb-1.5 md:mb-3"><p className="text-[10px] md:text-sm font-black text-slate-400 uppercase tracking-widest">{label}</p></div>}
+    {/* Height increased to h-[64px] on desktop */}
+    <div className="bg-slate-50 border-2 border-slate-200 rounded-xl md:rounded-2xl px-3 md:px-5 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px] md:h-[64px]">
+      {prefix && <span className="text-sm md:text-lg font-bold text-slate-400 mr-2 md:mr-3">{prefix}</span>}
       <input 
         type={type}
         inputMode={inputMode || (type === 'number' ? 'decimal' : 'numeric')}
-        className="w-full bg-transparent outline-none font-bold text-slate-700 text-base tabular-nums placeholder:text-slate-300"
+        className="w-full bg-transparent outline-none font-bold text-slate-700 text-base md:text-xl tabular-nums placeholder:text-slate-300"
         value={value}
         onChange={onChange}
       />
-      {suffix && <span className="text-xs font-bold text-slate-400 ml-2">{suffix}</span>}
+      {suffix && <span className="text-xs md:text-base font-bold text-slate-400 ml-2 md:ml-3">{suffix}</span>}
     </div>
   </div>
 );
@@ -110,7 +110,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null); 
   const [showPreset, setShowPreset] = useState(false);
 
-  // Inputs Halaman 1
+  // Inputs
   const [inputs, setInputs] = useState({
     mainVal: "25.000",
     subVal: "0",
@@ -122,7 +122,6 @@ export default function App() {
     mShare: 50
   });
 
-  // Inputs Halaman 3 (Prospect)
   const [histData, setHistData] = useState({
     omset: "50.000.000",
     orders: "1000",
@@ -131,8 +130,6 @@ export default function App() {
   });
   const [growthProj, setGrowthProj] = useState(20);
   const [futureCostPct, setFutureCostPct] = useState(5); 
-
-  // Inputs Halaman 4 (Ads)
   const [adsBudget, setAdsBudget] = useState("30.000"); 
   const [adsType, setAdsType] = useState('keyword'); 
 
@@ -140,7 +137,6 @@ export default function App() {
   const [isEditingAppPrice, setIsEditingAppPrice] = useState(false);
 
   const [cart, setCart] = useState([]);
-  
   const [activeVoucher, setActiveVoucher] = useState(null);
   const [deliveryType, setDeliveryType] = useState('prioritas');
   const [showVoucherDropdown, setShowVoucherDropdown] = useState(false);
@@ -381,7 +377,8 @@ export default function App() {
         }
       `}</style>
 
-      <div className="w-full md:max-w-5xl bg-transparent min-h-screen relative flex flex-col md:px-6">
+      {/* Main Container Scaled Up for Desktop */}
+      <div className="w-full md:max-w-6xl bg-transparent min-h-screen relative flex flex-col md:px-10">
         
         {/* MODAL */}
         {activeModal && (
@@ -433,16 +430,16 @@ export default function App() {
           </div>
         )}
 
-        {/* DASHBOARD HEADER */}
-        <div className="fixed top-0 left-0 right-0 z-50 p-3 bg-gradient-to-b from-[#002a14]/90 to-transparent md:relative md:bg-none md:p-0 md:mt-4 md:mx-auto md:w-full">
-          <div className="grid grid-cols-3 gap-2 md:gap-4 md:max-w-5xl">
+        {/* DASHBOARD HEADER - SCALED FOR DESKTOP */}
+        <div className="fixed top-0 left-0 right-0 z-50 p-3 bg-gradient-to-b from-[#002a14]/90 to-transparent md:relative md:bg-none md:p-0 md:mt-6 md:mx-auto md:w-full">
+          <div className="grid grid-cols-3 gap-2 md:gap-6 md:max-w-6xl">
             {/* Panel 1: App Price */}
-            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] relative group">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-                App Price <Edit3 size={10} className="text-slate-300"/>
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] md:h-[100px] relative group">
+              <p className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                App Price <Edit3 size={12} className="text-slate-300 md:w-4 md:h-4"/>
               </p>
               <input 
-                className="w-full bg-transparent border-none text-center outline-none font-black text-2xl text-slate-800 tabular-nums p-0 placeholder:text-slate-300"
+                className="w-full bg-transparent border-none text-center outline-none font-black text-2xl md:text-4xl text-slate-800 tabular-nums p-0 placeholder:text-slate-300"
                 value={isEditingAppPrice ? localAppPrice : fNum(calc.list)}
                 onChange={(e) => handleAppPriceManual(e.target.value)}
                 onFocus={() => { setIsEditingAppPrice(true); setLocalAppPrice(fNum(calc.list)); }}
@@ -454,21 +451,21 @@ export default function App() {
 
             {/* Panel 2: Pax Pays */}
             <div 
-              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] md:h-[100px] cursor-pointer hover:scale-[1.02] transition-transform" 
               onClick={() => setActiveModal('cust')}
             >
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Pax Pays</p>
+              <p className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest mb-0.5">Pax Pays</p>
               {calc.list > calc.pay ? (
                 <div className="flex flex-col items-center leading-none">
-                   <span className="text-[10px] text-slate-300 line-through decoration-slate-300 font-bold mb-0.5">
+                   <span className="text-[10px] md:text-sm text-slate-300 line-through decoration-slate-300 font-bold mb-0.5">
                      Rp {fNum(calc.list)}
                    </span>
-                   <span className="font-black text-lg md:text-xl text-emerald-600 tabular-nums">
+                   <span className="font-black text-lg md:text-3xl text-emerald-600 tabular-nums">
                      Rp {fNum(calc.pay)}
                    </span>
                 </div>
               ) : (
-                <div className="font-black text-lg md:text-xl text-emerald-600 tabular-nums leading-none mt-1">
+                <div className="font-black text-lg md:text-3xl text-emerald-600 tabular-nums leading-none mt-1">
                   Rp {fNum(calc.pay)}
                 </div>
               )}
@@ -476,27 +473,27 @@ export default function App() {
 
             {/* Panel 3: Net Rev */}
             <div 
-              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] md:h-[100px] cursor-pointer hover:scale-[1.02] transition-transform" 
               onClick={() => setActiveModal('net')}
             >
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Rev</p>
-              <div className="font-black text-lg md:text-xl text-blue-600 tabular-nums leading-none">Rp {fNum(calc.net)}</div>
-              <p className="text-[8px] font-bold text-rose-500 mt-1.5 bg-rose-50 px-1.5 py-0.5 rounded-md">Mex Inv: {calc.mexInvestPct.toFixed(1)}%</p>
+              <p className="text-[9px] md:text-sm font-black text-slate-400 uppercase tracking-widest mb-1">Net Rev</p>
+              <div className="font-black text-lg md:text-3xl text-blue-600 tabular-nums leading-none">Rp {fNum(calc.net)}</div>
+              <p className="text-[8px] md:text-xs font-bold text-rose-500 mt-1.5 bg-rose-50 px-1.5 py-0.5 rounded-md">Mex Inv: {calc.mexInvestPct.toFixed(1)}%</p>
             </div>
           </div>
         </div>
 
-        <div className="h-[105px] md:h-8"></div>
+        <div className="h-[90px] md:h-8"></div>
 
         <main className="flex-1 p-4 space-y-4 md:p-0">
           
           {/* PAGE 1: CALCULATOR */}
           {page === 'calc' && (
-            <div className="space-y-4 md:space-y-6 md:scale-[1.02] md:origin-top pb-10">
+            <div className="space-y-4 md:space-y-6 pb-10">
               {/* Full Width Strategy Card */}
-              <Card isDark={true} className="md:p-6 min-h-[200px] flex flex-col justify-center">
+              <Card isDark={true} className="md:p-8 min-h-[220px] flex flex-col justify-center">
                 <Label icon={Tags} isDark={true}>1. Strategi Campaign</Label>
-                <div className="grid grid-cols-4 gap-2 mb-4">
+                <div className="grid grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-6">
                   {Object.keys(STRATEGY).map(k => {
                     const isSpecial = (k === 'puas-cuan' || k === 'booster');
                     const isActive = scheme === k;
@@ -505,7 +502,7 @@ export default function App() {
                         key={k} 
                         onClick={() => setScheme(k)} 
                         className={`
-                          py-2.5 rounded-xl text-xs font-black uppercase transition-all duration-200 border-2 relative
+                          py-2.5 md:py-5 rounded-xl md:rounded-2xl text-xs md:text-sm font-black uppercase transition-all duration-200 border-2 relative
                           ${isActive 
                             ? 'bg-[#FFD200] border-[#FFD200] text-slate-900 shadow-md transform scale-105' 
                             : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white hover:border-white/30'
@@ -519,23 +516,23 @@ export default function App() {
                   })}
                 </div>
 
-                <div className="h-px bg-white/10 w-full my-3"></div>
+                <div className="h-px bg-white/10 w-full my-3 md:my-5"></div>
 
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                   <div className="flex-1">
-                    <h2 className="font-black text-xl text-white tracking-tight italic mb-2">{STRATEGY[scheme].title}</h2>
+                    <h2 className="font-black text-xl md:text-3xl text-white tracking-tight italic mb-2">{STRATEGY[scheme].title}</h2>
                     {STRATEGY[scheme].tiers && (
-                      <div className="flex bg-black/20 p-1 rounded-lg border border-white/5 shadow-inner self-start mb-2 md:mb-0 md:float-right">
+                      <div className="flex bg-black/20 p-1 rounded-lg border border-white/5 shadow-inner self-start mb-2 md:mb-0 md:float-right md:ml-4">
                         {['hemat', 'ekstra'].map(t => (
-                          <button key={t} onClick={() => setTier(t)} className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase transition-all ${tier === t ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>{t}</button>
+                          <button key={t} onClick={() => setTier(t)} className={`px-3 py-1.5 md:px-5 md:py-2 rounded-md text-[10px] md:text-xs font-black uppercase transition-all ${tier === t ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}>{t}</button>
                         ))}
                       </div>
                     )}
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 md:gap-3 mt-3">
                       {STRATEGY[scheme].benefits.map((b, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <div className="bg-emerald-500/20 text-emerald-400 rounded-full p-0.5 mt-0.5 shrink-0"><Check size={10} strokeWidth={4}/></div>
-                          <span className="text-xs font-bold text-slate-200 leading-snug">{b}</span>
+                        <div key={i} className="flex items-start gap-2 md:gap-3">
+                          <div className="bg-emerald-500/20 text-emerald-400 rounded-full p-0.5 mt-0.5 shrink-0"><Check size={10} strokeWidth={4} className="md:w-4 md:h-4"/></div>
+                          <span className="text-xs md:text-base font-bold text-slate-200 leading-snug">{b}</span>
                         </div>
                       ))}
                     </div>
@@ -544,13 +541,13 @@ export default function App() {
 
                 {scheme === 'cofund' && (
                   <div className="mt-4 pt-3 border-t border-white/10">
-                    <div className="bg-blue-600/90 backdrop-blur-md rounded-xl p-4 text-white shadow-lg border border-blue-500/30">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="bg-blue-600/90 backdrop-blur-md rounded-xl p-4 md:p-6 text-white shadow-lg border border-blue-500/30">
+                      <div className="flex justify-between items-center mb-2 md:mb-4">
                         <div className="flex items-center gap-2">
-                          <Users2 size={14} className="text-blue-200" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-100">Mex Promo Share</span>
+                          <Users2 size={14} className="text-blue-200 md:w-5 md:h-5" />
+                          <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-blue-100">Mex Promo Share</span>
                         </div>
-                        <span className="text-xs font-black bg-black/20 px-2 py-0.5 rounded-lg border border-white/10">{inputs.mShare}%</span>
+                        <span className="text-xs md:text-base font-black bg-black/20 px-2 py-0.5 rounded-lg border border-white/10">{inputs.mShare}%</span>
                       </div>
                       
                       <input 
@@ -560,17 +557,17 @@ export default function App() {
                         step="5" 
                         value={inputs.mShare}
                         onChange={(e) => setInputs(prev => ({ ...prev, mShare: parseInt(e.target.value) }))}
-                        className="w-full h-1.5 bg-blue-900/50 rounded-lg appearance-none cursor-pointer accent-white mb-3"
+                        className="w-full h-1.5 md:h-3 bg-blue-900/50 rounded-lg appearance-none cursor-pointer accent-white mb-3 md:mb-6"
                       />
 
                       <div className="flex justify-between items-end">
                         <div className="text-left">
-                          <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Toko</p>
-                          <p className="font-black text-sm">Rp {fNum(calc.mPromoCost)}</p>
+                          <p className="text-[9px] md:text-xs text-blue-100 uppercase font-bold mb-0.5">Beban Toko</p>
+                          <p className="font-black text-sm md:text-xl">Rp {fNum(calc.mPromoCost)}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[9px] text-blue-100 uppercase font-bold mb-0.5">Beban Grab</p>
-                          <p className="font-black text-sm text-[#FFD200]">Rp {fNum(calc.totalDisc - calc.mPromoCost)}</p>
+                          <p className="text-[9px] md:text-xs text-blue-100 uppercase font-bold mb-0.5">Beban Grab</p>
+                          <p className="font-black text-sm md:text-xl text-[#FFD200]">Rp {fNum(calc.totalDisc - calc.mPromoCost)}</p>
                         </div>
                       </div>
                     </div>
@@ -579,39 +576,39 @@ export default function App() {
               </Card>
 
               {/* Side-by-Side Inputs */}
-              <div className="md:grid md:grid-cols-2 md:gap-4 space-y-4 md:space-y-0">
+              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-4 md:space-y-0">
                 
                 {/* Left: Input Menu */}
                 <div className="h-full">
-                   <Card className="h-full md:p-8 md:min-h-[320px] flex flex-col justify-center">
+                   <Card className="h-full md:p-8 flex flex-col justify-center">
                     <Label icon={List}>2. Input Data Menu</Label>
-                    <div className="flex gap-3 mb-6">
+                    <div className="flex gap-3 mb-6 md:mb-8">
                       <div className="flex-1">
                         <InputGroup label="Harga Offline" prefix="Rp" value={inputs.mainVal} onChange={(e) => handleInputChange('mainVal', e.target.value)} />
                       </div>
                       <div className="flex-1">
-                        <div className="mb-1.5"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subsidi Toko</p></div>
-                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[50px]">
-                          <input type="text" inputMode="numeric" className="w-full bg-transparent outline-none font-bold text-slate-700 text-base tabular-nums placeholder:text-slate-300" value={inputs.subVal} onChange={(e) => handleInputChange('subVal', e.target.value)} />
+                        <div className="mb-1.5 md:mb-3"><p className="text-[10px] md:text-sm font-black text-slate-400 uppercase tracking-widest">Subsidi Toko</p></div>
+                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl px-3 flex items-center transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:shadow-md h-[46px] md:h-[64px]">
+                          <input type="text" inputMode="numeric" className="w-full bg-transparent outline-none font-bold text-slate-700 text-base md:text-xl tabular-nums placeholder:text-slate-300" value={inputs.subVal} onChange={(e) => handleInputChange('subVal', e.target.value)} />
                           <div className="flex bg-slate-200/60 rounded-lg p-1 ml-1 shrink-0 gap-1">
-                            <button onClick={() => setSubMode('val')} className={`w-6 h-6 flex items-center justify-center text-[8px] font-black rounded transition-all ${subMode === 'val' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>Rp</button>
-                            <button onClick={() => setSubMode('pct')} className={`w-6 h-6 flex items-center justify-center text-[8px] font-black rounded transition-all ${subMode === 'pct' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>%</button>
+                            <button onClick={() => setSubMode('val')} className={`w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-[8px] md:text-xs font-black rounded transition-all ${subMode === 'val' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>Rp</button>
+                            <button onClick={() => setSubMode('pct')} className={`w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-[8px] md:text-xs font-black rounded transition-all ${subMode === 'pct' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}>%</button>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2 items-end">
                       <InputGroup value={inputs.menuName} onChange={(e) => handleInputChange('menuName', e.target.value)} inputMode="text" />
-                      <button onClick={addToCart} className="h-[50px] px-6 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-[10px] uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={14} strokeWidth={3}/></button>
+                      <button onClick={addToCart} className="h-[46px] md:h-[64px] px-6 md:px-8 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">Add <ArrowRight size={14} strokeWidth={3} className="md:w-5 md:h-5"/></button>
                     </div>
                   </Card>
                 </div>
 
                 {/* Right: Config */}
                 <div className="h-full">
-                  <Card className="h-full md:p-8 md:min-h-[320px] flex flex-col justify-center">
+                  <Card className="h-full md:p-8 flex flex-col justify-center">
                     <Label icon={Settings}>3. Konfigurasi</Label>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-y-8">
                       <InputGroup label="Komisi (%)" value={inputs.kPct} type="number" onChange={(e) => handleInputChange('kPct', e.target.value)} />
                       <InputGroup label="Diskon (%)" value={inputs.vDisk} type="number" onChange={(e) => handleInputChange('vDisk', e.target.value)} />
                       <InputGroup label="Min. Order" value={inputs.minO} onChange={(e) => handleInputChange('minO', e.target.value)} />
@@ -624,7 +621,7 @@ export default function App() {
             </div>
           )}
           
-          {/* ... (Keep other pages: checkout, prospect, ads as is) ... */}
+          {/* ... (Keep other pages: checkout, prospect, ads as is - they will benefit from scaled components) ... */}
           {/* PAGE 2: CHECKOUT */}
           {page === 'checkout' && (
             <div className="space-y-6 pb-32">
