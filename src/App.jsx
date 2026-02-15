@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Home, 
   ShoppingCart, 
@@ -15,7 +15,6 @@ import {
   Tags,
   TrendingUp,
   BarChart3,
-  PieChart,
   Wallet,
   Ticket,
   ChevronDown,
@@ -39,11 +38,6 @@ const VOUCHERS = [
   { code: 'PUAS30', scheme: 'puas-cuan', label: 'Diskon Puas 30%', desc: 'Potongan 30%', disc: 30 },
   { code: 'PUAS35', scheme: 'booster', label: 'Diskon Puas 35%', desc: 'Potongan 35%', disc: 35 },
   { code: 'MITRA50', scheme: 'cofund', label: 'Diskon 40% (Patungan)', desc: 'Sharing Cost', disc: 40 }
-];
-
-const PRESETS = [
-  { name: "Brand Week", v: 45, s: 55, min: 50000, max: 50000 },
-  { name: "Flash Sale", v: 50, s: 60, min: 64000, max: 40000 }
 ];
 
 // --- UTILS ---
@@ -74,17 +68,16 @@ const Card = ({ children, className = "", isDark = false, overflowHidden = true 
   </div>
 );
 
-// Updated Label Component: Much larger text and padding
+// REVISI: Ukuran font diperkecil (text-sm md:text-base)
 const Label = ({ icon: Icon, children, isDark = false }) => (
   <div className={`inline-flex items-center gap-3 px-4 py-2.5 rounded-xl shadow-sm backdrop-blur-sm mb-5 ${isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100/90 border border-slate-200'}`}>
-    {Icon ? <Icon size={20} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-2 h-2 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
-    <span className={`text-lg md:text-xl font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
+    {Icon ? <Icon size={18} className={isDark ? "text-emerald-400" : "text-emerald-600"} /> : <div className={`w-2 h-2 rounded-full shadow-sm ${isDark ? 'bg-emerald-400' : 'bg-emerald-500'}`} />}
+    <span className={`text-sm md:text-base font-black uppercase tracking-widest leading-none pt-[1px] ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
       {children}
     </span>
   </div>
 );
 
-// Updated InputGroup: Slightly larger label for better hierarchy
 const InputGroup = ({ label, prefix, suffix, value, onChange, type = "text", inputMode }) => (
   <div className="w-full">
     {label && <div className="mb-2"><p className="text-xs font-black text-slate-500 uppercase tracking-widest">{label}</p></div>}
@@ -108,7 +101,6 @@ export default function App() {
   const [tier, setTier] = useState('hemat');
   const [subMode, setSubMode] = useState('val'); 
   const [activeModal, setActiveModal] = useState(null); 
-  const [showPreset, setShowPreset] = useState(false);
 
   // Inputs Halaman 1
   const [inputs, setInputs] = useState({
@@ -135,6 +127,8 @@ export default function App() {
   // Inputs Halaman 4 (Ads)
   const [adsBudget, setAdsBudget] = useState("30.000"); 
   const [adsType, setAdsType] = useState('keyword'); 
+  // REVISI: State untuk CPC Manual
+  const [cpcBid, setCpcBid] = useState("2.500");
 
   const [localAppPrice, setLocalAppPrice] = useState("");
   const [isEditingAppPrice, setIsEditingAppPrice] = useState(false);
@@ -185,6 +179,12 @@ export default function App() {
       minO: conf.tiers ? fNum(conf.tiers[tier].min) : "0"
     }));
   }, [scheme, tier]);
+
+  // REVISI: Reset CPC saat tipe iklan ganti
+  useEffect(() => {
+    if (adsType === 'keyword') setCpcBid("2.500");
+    else setCpcBid("800");
+  }, [adsType]);
 
   const handleInputChange = (key, value) => {
     let cleanVal = value;
@@ -353,9 +353,10 @@ export default function App() {
     };
   }, [histData, growthProj, checkout, futureCostPct]);
 
+  // REVISI: Logika AdsSim menggunakan CPC Manual
   const adsSim = useMemo(() => {
     const budget = pNum(adsBudget);
-    const cpc = adsType === 'keyword' ? 2500 : 800; 
+    const cpc = pNum(cpcBid) || (adsType === 'keyword' ? 2500 : 800); 
     const estClicks = Math.floor(budget / cpc);
     const cvr = adsType === 'keyword' ? 0.15 : 0.05; 
     const estOrders = Math.floor(estClicks * cvr);
@@ -363,7 +364,7 @@ export default function App() {
     const estGrossSales = estOrders * baseAOV;
     const roas = budget > 0 ? (estGrossSales / budget) : 0;
     return { cpc, estClicks, cvr, estOrders, estGrossSales, roas, baseAOV };
-  }, [adsBudget, adsType, histData.aov]);
+  }, [adsBudget, adsType, histData.aov, cpcBid]);
 
   return (
     <div className="min-h-screen font-sans text-slate-900 pb-32 overflow-x-hidden flex justify-center bg-[#002a14]" 
@@ -624,14 +625,11 @@ export default function App() {
             </div>
           )}
           
-          {/* ... (Keep other pages: checkout, prospect, ads as is) ... */}
           {/* PAGE 2: CHECKOUT */}
           {page === 'checkout' && (
             <div className="space-y-6 pb-32">
               <header className="flex items-center gap-4 pt-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
+                  {/* REVISI: Tombol Back Dihapus */}
                   <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Checkout</h1>
               </header>
 
@@ -825,9 +823,7 @@ export default function App() {
           {page === 'prospect' && (
             <div className="space-y-6 pb-32">
                <header className="flex items-center gap-4 pt-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
+                  {/* REVISI: Tombol Back Dihapus */}
                   <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
                 </header>
                 
@@ -976,9 +972,7 @@ export default function App() {
             <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0 pb-32">
               <div className="space-y-6">
                 <header className="flex items-center gap-4">
-                  <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
-                    <ChevronLeft size={24} strokeWidth={3}/>
-                  </button>
+                  {/* REVISI: Tombol Back Dihapus */}
                   <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
                 </header>
 
@@ -1017,10 +1011,24 @@ export default function App() {
                   <Label icon={Target}>Targeting & Budget</Label>
                   <div className="space-y-4">
                     <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
+                    
+                    {/* REVISI: Custom CPC Input Ditambahkan Disini */}
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <InputGroup 
+                          label="Max CPC (Bid)" 
+                          prefix="Rp" 
+                          value={cpcBid} 
+                          onChange={(e) => setCpcBid(e.target.value)} 
+                          inputMode="numeric"
+                        />
+                      </div>
+                    </div>
+
                     <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
                       <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
                       <p className="text-[10px] text-blue-700 font-medium">
-                        Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
+                        CPC Default: <span className="font-black">Rp {adsType === 'keyword' ? '2.500' : '800'}</span>. Anda bisa mengubah CPC diatas untuk simulasi bid yang berbeda.
                       </p>
                     </div>
                   </div>
@@ -1123,3 +1131,5 @@ export default function App() {
     </div>
   );
 }
+
+
