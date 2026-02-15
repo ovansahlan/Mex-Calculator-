@@ -35,7 +35,6 @@ const STRATEGY = {
   'cofund': { k: 20, v: 40, tiers: null, title: 'COFUND', benefits: ['Sharing Cost Promo', 'Akses ke Pengguna Baru'] }
 };
 
-// VOUCHER Updated
 const VOUCHERS = [
   { code: 'PUAS30', scheme: 'puas-cuan', label: 'Diskon Puas 30%', desc: 'Potongan 30%', disc: 30 },
   { code: 'PUAS35', scheme: 'booster', label: 'Diskon Puas 35%', desc: 'Potongan 35%', disc: 35 },
@@ -109,7 +108,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null); 
   const [showPreset, setShowPreset] = useState(false);
 
-  // Inputs Halaman 1
+  // Inputs
   const [inputs, setInputs] = useState({
     mainVal: "25.000",
     subVal: "0",
@@ -121,7 +120,6 @@ export default function App() {
     mShare: 50
   });
 
-  // Inputs Halaman 3 (Prospect)
   const [histData, setHistData] = useState({
     omset: "50.000.000",
     orders: "1000",
@@ -130,21 +128,18 @@ export default function App() {
   });
   const [growthProj, setGrowthProj] = useState(20);
   const [futureCostPct, setFutureCostPct] = useState(5); 
-
-  // Inputs Halaman 4 (Ads)
-  const [adsBudget, setAdsBudget] = useState("30.000"); // Budget Harian
-  const [adsType, setAdsType] = useState('keyword'); // 'keyword' | 'banner'
+  const [adsBudget, setAdsBudget] = useState("30.000"); 
+  const [adsType, setAdsType] = useState('keyword'); 
 
   const [localAppPrice, setLocalAppPrice] = useState("");
   const [isEditingAppPrice, setIsEditingAppPrice] = useState(false);
 
   const [cart, setCart] = useState([]);
-  
   const [activeVoucher, setActiveVoucher] = useState(null);
   const [deliveryType, setDeliveryType] = useState('prioritas');
   const [showVoucherDropdown, setShowVoucherDropdown] = useState(false);
 
-  // --- CALCULATION CORE ---
+  // --- CALCULATION ---
   const calc = useMemo(() => {
     const off = pNum(inputs.mainVal);
     const subRaw = pNum(inputs.subVal);
@@ -277,7 +272,6 @@ export default function App() {
     if (activeVoucher) {
       schemeKey = activeVoucher.scheme;
       const conf = STRATEGY[schemeKey];
-
       if (conf.tiers && conf.tiers[tier]) {
         limitMin = conf.tiers[tier].min;
         limitMax = conf.tiers[tier].max;
@@ -285,11 +279,9 @@ export default function App() {
         limitMin = pNum(inputs.minO);
         limitMax = pNum(inputs.mDisk) || Infinity;
       }
-
       if (subtotal >= limitMin) {
         const rawDisc = Math.round(subtotal * (activeVoucher.disc / 100));
         totalPotDisc = Math.min(rawDisc, limitMax);
-
         if (schemeKey === 'cofund') {
           const sharePct = inputs.mShare;
           totalMerchantCost = Math.round(totalPotDisc * (sharePct / 100));
@@ -305,16 +297,8 @@ export default function App() {
     const total = subtotal - totalPotDisc + finalOngkir + 1500;
 
     return { 
-      subtotal, 
-      finalDisc: totalPotDisc, 
-      finalOngkir, 
-      total, 
-      ongkirDisc,
-      totalMerchantCost,
-      schemeKey,
-      limitMin,
-      limitMax,
-      thresholdMet
+      subtotal, finalDisc: totalPotDisc, finalOngkir, total, ongkirDisc,
+      totalMerchantCost, schemeKey, limitMin, limitMax, thresholdMet
     };
   }, [cart, activeVoucher, deliveryType, inputs.mShare, inputs.minO, inputs.mDisk, tier]);
 
@@ -323,7 +307,6 @@ export default function App() {
     const hOrders = pNum(histData.orders);
     const hAOV = pNum(histData.aov);
     const hInvestPct = pFloat(histData.invest); 
-    
     const hDailyOrders = hOrders > 0 ? Math.round(hOrders / 30) : 0;
     const hInvestAmount = Math.round(hOmset * (hInvestPct / 100));
     const hNet = hOmset - hInvestAmount;
@@ -422,15 +405,16 @@ export default function App() {
           </div>
         )}
 
-        {/* DASHBOARD HEADER */}
-        <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl shadow-lg border-b-4 border-[#FFD200] rounded-b-[20px] md:relative md:rounded-[20px] md:mt-4 md:border-none md:mx-auto md:w-full md:shadow-xl">
-          <div className="grid grid-cols-3 py-4 px-3 text-center divide-x divide-slate-100">
-            <div className="relative group">
-              <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 flex justify-center items-center gap-1">
+        {/* DASHBOARD HEADER - SPLIT 3 PANELS */}
+        <div className="fixed top-0 left-0 right-0 z-50 p-3 bg-gradient-to-b from-[#002a14]/90 to-transparent md:relative md:bg-none md:p-0 md:mt-4 md:mx-auto md:w-full">
+          <div className="grid grid-cols-3 gap-2 md:gap-4 md:max-w-5xl">
+            {/* Panel 1: App Price */}
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] relative group">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
                 App Price <Edit3 size={10} className="text-slate-300"/>
               </p>
               <input 
-                className="w-full bg-transparent border-none text-center outline-none font-black text-xl text-slate-900 tabular-nums p-0 placeholder:text-slate-300"
+                className="w-full bg-transparent border-none text-center outline-none font-black text-xl md:text-2xl text-slate-800 tabular-nums p-0 placeholder:text-slate-300"
                 value={isEditingAppPrice ? localAppPrice : fNum(calc.list)}
                 onChange={(e) => handleAppPriceManual(e.target.value)}
                 onFocus={() => { setIsEditingAppPrice(true); setLocalAppPrice(fNum(calc.list)); }}
@@ -439,19 +423,43 @@ export default function App() {
                 placeholder="0"
               />
             </div>
-            <div className="cursor-pointer hover:bg-slate-50 transition-colors rounded-xl" onClick={() => setActiveModal('cust')}>
-              <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5">Pax Pays</p>
-              <div className="font-black text-xl text-emerald-600 tabular-nums">Rp {fNum(calc.pay)}</div>
+
+            {/* Panel 2: Pax Pays */}
+            <div 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              onClick={() => setActiveModal('cust')}
+            >
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Pax Pays</p>
+              {calc.list > calc.pay ? (
+                <div className="flex flex-col items-center leading-none">
+                   <span className="text-[10px] text-slate-400 line-through decoration-slate-300 font-bold mb-0.5">
+                     Rp {fNum(calc.list)}
+                   </span>
+                   <span className="font-black text-lg md:text-xl text-emerald-600 tabular-nums">
+                     Rp {fNum(calc.pay)}
+                   </span>
+                </div>
+              ) : (
+                <div className="font-black text-lg md:text-xl text-emerald-600 tabular-nums leading-none mt-1">
+                  Rp {fNum(calc.pay)}
+                </div>
+              )}
             </div>
-            <div className="cursor-pointer hover:bg-slate-50 transition-colors rounded-xl" onClick={() => setActiveModal('net')}>
-              <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5">Net Rev</p>
-              <div className="font-black text-xl text-blue-600 tabular-nums leading-none">Rp {fNum(calc.net)}</div>
-              <p className="text-[9px] font-bold text-rose-500 mt-1">Mex Inv: {calc.mexInvestPct.toFixed(1)}%</p>
+
+            {/* Panel 3: Net Rev */}
+            <div 
+              className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[85px] cursor-pointer hover:scale-[1.02] transition-transform" 
+              onClick={() => setActiveModal('net')}
+            >
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Rev</p>
+              <div className="font-black text-lg md:text-xl text-blue-600 tabular-nums leading-none">Rp {fNum(calc.net)}</div>
+              <p className="text-[8px] font-bold text-rose-500 mt-1.5 bg-rose-50 px-1.5 py-0.5 rounded-md">Mex Inv: {calc.mexInvestPct.toFixed(1)}%</p>
             </div>
           </div>
         </div>
 
-        <div className="h-[100px] md:h-8"></div>
+        {/* SPACER FOR FIXED HEADER */}
+        <div className="h-[105px] md:h-8"></div>
 
         <main className="flex-1 p-5 space-y-8 md:p-0">
           
@@ -578,20 +586,6 @@ export default function App() {
                     )}
                   </div>
                 </Card>
-
-                <div className="grid grid-cols-2 gap-5 mt-2">
-                  <div className="bg-slate-900/70 backdrop-blur-xl rounded-[28px] p-6 border border-white/10 text-white shadow-2xl">
-                    <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-3">Normal Price</p>
-                    <p className="text-2xl font-black italic tracking-tight mb-2">Rp {fNum(calc.normalPay)}</p>
-                    <div className="w-10 h-1.5 bg-white/10 rounded-full"/>
-                  </div>
-                  <div className="bg-emerald-600 rounded-[28px] p-6 border border-white/10 text-white shadow-2xl shadow-emerald-900/30 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-3xl"/>
-                    <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest mb-3">Campaign</p>
-                    <p className="text-2xl font-black italic tracking-tight mb-2">Rp {fNum(calc.pay)}</p>
-                    <div className="w-10 h-1.5 bg-white/40 rounded-full"/>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -728,7 +722,6 @@ export default function App() {
                         )}
                       </div>
                       
-                      {/* DISPLAY INFO THRESHOLD */}
                       {activeVoucher && (
                         <div className="mt-3 bg-slate-50 rounded-xl p-3 border border-slate-100">
                           <div className="flex justify-between text-[10px] mb-1">
@@ -773,6 +766,20 @@ export default function App() {
                             </div>
                           )}
                       </div>
+
+                      {/* NEW: Total & Button for Desktop */}
+                      <div className="hidden md:block pt-8 mt-6 border-t-2 border-slate-100/80">
+                        <div className="flex justify-between items-end mb-6">
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Tagihan</p>
+                                <p className="text-4xl font-black text-slate-900 italic tracking-tighter">Rp {fNum(checkout.total)}</p>
+                            </div>
+                        </div>
+                        <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white p-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-[0.98] flex justify-center items-center gap-3 group">
+                            Pesan Sekarang 
+                            <ArrowRight size={18} strokeWidth={3} className="group-hover:translate-x-1 transition-transform"/>
+                        </button>
+                      </div>
                     </div>
                   </div>
               </div>
@@ -782,235 +789,237 @@ export default function App() {
           {/* PAGE 3: PROSPECT */}
           {page === 'prospect' && (
             <div className="space-y-6 pb-32">
-               <header className="flex items-center gap-4 pt-4">
+              <header className="flex items-center gap-4 pt-4">
                   <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
                     <ChevronLeft size={24} strokeWidth={3}/>
                   </button>
                   <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">Proyeksi Bisnis</h1>
-                </header>
-                
-                <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
-                  <div className="space-y-6">
-                    <Card>
-                      <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
-                      <div className="space-y-4">
-                        <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
-                        <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
-                        <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
-                        <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
-                      </div>
-                    </Card>
+              </header>
 
-                    <Card>
-                      <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
-                      <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
-                        <div className="flex justify-between items-center mb-4">
-                          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
-                          <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
-                        </div>
-                        <input 
-                          type="range" 
-                          min="0" 
-                          max="200" 
-                          step="5"
-                          value={growthProj} 
-                          onChange={(e) => setGrowthProj(Number(e.target.value))}
-                          className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                        />
-                        <p className="text-[10px] text-slate-400 font-medium mt-3 text-center">Geser untuk simulasi kenaikan order</p>
+              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
+                <div className="space-y-6">
+                  <Card>
+                    <Label icon={BarChart3}>Data Historis (Rata2/Bulan)</Label>
+                    <div className="space-y-4">
+                      <InputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
+                      <InputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
+                      <InputGroup label="AOV (Otomatis/Manual)" prefix="Rp" value={histData.aov} onChange={(e) => handleHistChange('aov', e.target.value)} />
+                      <InputGroup label="Investasi Promo/Ads" suffix="%" value={histData.invest} onChange={(e) => handleHistChange('invest', e.target.value)} />
+                    </div>
+                  </Card>
+
+                  <Card>
+                    <Label icon={TrendingUp}>Target Pertumbuhan Order</Label>
+                    <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-100">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Kenaikan</span>
+                        <span className="text-2xl font-black text-emerald-600">{growthProj}%</span>
                       </div>
-                    </Card>
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="200" 
+                        step="5"
+                        value={growthProj} 
+                        onChange={(e) => setGrowthProj(Number(e.target.value))}
+                        className="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                      />
+                      <p className="text-[10px] text-slate-400 font-medium mt-3 text-center">Geser untuk simulasi kenaikan order</p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white">
+                    <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
+                    <div className="space-y-5">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
+                        <p className="text-2xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
+                        <p className="text-xl font-black text-white">{fNum(projection.hOrders)} <span className="text-sm text-slate-200 font-bold ml-1">({fNum(projection.hDailyOrders)}/hari)</span></p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
+                        <p className="text-xl font-black text-white">Rp {fNum(projection.hAOV)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
+                        <p className="text-xl font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
+                        <p className="text-xl font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="bg-slate-900/80 backdrop-blur-xl rounded-[24px] p-6 border border-white/10 text-white">
-                      <p className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em] mb-6">Saat Ini (Avg 1 Thn)</p>
-                      <div className="space-y-5">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Omset</p>
-                          <p className="text-xl font-black text-white">Rp {fNum(projection.hOmset)}</p>
+                  <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30">
+                    <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                    <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
+                    <div className="space-y-5 relative z-10">
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
+                        <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
+                        <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-white/90 font-bold ml-1">({fNum(projection.pDailyOrders)}/hari)</span></p>
+                        <p className="text-[8px] text-emerald-300 mt-0.5 font-bold">+{growthProj}% dari Historis</p>
+                      </div>
+                      
+                      {/* INPUT FUTURE COST */}
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                           <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
                         </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Orders</p>
-                          <p className="text-lg font-black text-white">{fNum(projection.hOrders)} <span className="text-xs text-slate-500 font-medium">({fNum(projection.hDailyOrders)}/hari)</span></p>
+                        <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
+                           <input 
+                              type="number" 
+                              value={futureCostPct}
+                              onChange={(e) => setFutureCostPct(e.target.value)}
+                              className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
+                           />
+                           <span className="text-xs font-bold text-emerald-200">%</span>
                         </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">AOV (Rata-rata)</p>
-                          <p className="text-lg font-black text-white">Rp {fNum(projection.hAOV)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ({projection.hInvestPct}%)</p>
-                          <p className="text-lg font-black text-rose-400">Rp {fNum(projection.hInvestAmount)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit</p>
-                          <p className="text-lg font-black text-emerald-400">Rp {fNum(projection.hNet)}</p>
-                        </div>
+                        <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
+                        <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
+                        <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="bg-emerald-600 rounded-[24px] p-6 border border-white/20 text-white relative overflow-hidden shadow-xl shadow-emerald-900/30">
-                      <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-                      <p className="text-[11px] font-black text-emerald-100 uppercase tracking-[0.2em] mb-6">Proyeksi Masa Depan</p>
-                      <div className="space-y-5 relative z-10">
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Omset</p>
-                          <p className="text-3xl font-black text-white">Rp {fNum(projection.pOmset)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Orders</p>
-                          <p className="text-xl font-black text-white">{fNum(projection.pOrders)} <span className="text-sm text-emerald-300 font-medium">({fNum(projection.pDailyOrders)}/hari)</span></p>
-                          <p className="text-[9px] text-emerald-300 mt-1 font-bold">+{growthProj}% dari Historis</p>
-                        </div>
-                        
-                        {/* INPUT FUTURE COST */}
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                             <p className="text-[10px] font-bold text-emerald-200 uppercase">Est. Cost %</p>
-                          </div>
-                          <div className="flex items-center gap-2 bg-black/20 rounded-lg px-2 py-1 border border-white/10 w-fit">
-                             <input 
-                                type="number" 
-                                value={futureCostPct}
-                                onChange={(e) => setFutureCostPct(e.target.value)}
-                                className="bg-transparent text-white font-bold text-lg w-12 outline-none text-center"
-                             />
-                             <span className="text-xs font-bold text-emerald-200">%</span>
-                          </div>
-                          <p className="text-sm font-bold text-white/80 mt-1">Rp {fNum(projection.pInvestTotal)}</p>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Est. Net Profit</p>
-                          <p className="text-xl font-black text-[#FFD200]">Rp {fNum(projection.pNet)}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">AOV Baru (Dr Cart)</p>
-                          <p className="text-sm font-bold text-white">Rp {fNum(projection.newAOV)}</p>
-                        </div>
+                  <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
+                    <Label icon={Wallet}>Analisa Profitability</Label>
+                    <div className="grid grid-cols-2 gap-8 mt-2">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
+                        <p className="text-lg font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
+                        <p className={`text-lg font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
+                          Rp {fNum(projection.pNet)}
+                        </p>
                       </div>
                     </div>
-
-                    <div className="bg-white rounded-[24px] p-6 shadow-xl border border-slate-100">
-                      <Label icon={Wallet}>Analisa Profitability</Label>
-                      <div className="grid grid-cols-2 gap-8 mt-2">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Net Profit Lama</p>
-                          <p className="text-lg font-black text-slate-700">Rp {fNum(projection.hNet)}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Net Profit Baru</p>
-                          <p className={`text-lg font-black ${projection.pNet >= projection.hNet ? 'text-emerald-600' : 'text-rose-500'}`}>
-                            Rp {fNum(projection.pNet)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Selisih Profit</span>
-                        <span className={`text-sm font-black px-3 py-1 rounded-full ${projection.pNet >= projection.hNet ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                          {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
-                        </span>
-                      </div>
+                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Selisih Profit</span>
+                      <span className={`text-sm font-black px-3 py-1 rounded-full ${projection.pNet >= projection.hNet ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                        {projection.pNet >= projection.hNet ? '+' : ''}{fNum(projection.pNet - projection.hNet)}
+                      </span>
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
           )}
 
           {/* PAGE 4: ADS */}
           {page === 'ads' && (
-            <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0 pb-32">
-              <div className="space-y-6">
-                <header className="flex items-center gap-4">
+            <div className="space-y-6 pb-32">
+              <header className="flex items-center gap-4 pt-4">
                   <button onClick={() => setPage('calc')} className="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all shadow-lg">
                     <ChevronLeft size={24} strokeWidth={3}/>
                   </button>
                   <h1 className="font-black uppercase text-sm tracking-[0.2em] text-white">GrabFood Ads</h1>
                 </header>
 
-                <Card>
-                  <Label icon={Megaphone}>Jenis Iklan</Label>
-                  <div className="space-y-4">
-                    <div 
-                      onClick={() => setAdsType('keyword')}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
-                        {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
+              <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
+                <div className="space-y-6">
+                  <Card>
+                    <Label icon={Megaphone}>Jenis Iklan</Label>
+                    <div className="space-y-4">
+                      <div 
+                        onClick={() => setAdsType('keyword')}
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'keyword' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-black text-slate-800">Pencarian (Keyword)</h4>
+                          {adsType === 'keyword' && <Check size={16} className="text-emerald-500" />}
+                        </div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
+                        </p>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Tampil paling atas saat pelanggan mencari makanan. Bayar hanya jika diklik (CPC). Cocok untuk menangkap niat beli tinggi.
-                      </p>
-                    </div>
 
-                    <div 
-                      onClick={() => setAdsType('banner')}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
-                        {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
+                      <div 
+                        onClick={() => setAdsType('banner')}
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${adsType === 'banner' ? 'bg-emerald-50 border-emerald-500' : 'bg-slate-50 border-slate-100'}`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-black text-slate-800">Jelajah (Banner)</h4>
+                          {adsType === 'banner' && <Check size={16} className="text-emerald-500" />}
+                        </div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
+                        </p>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Tampil di halaman utama sebagai rekomendasi. Bagus untuk membangun *brand awareness* ke pelanggan baru.
+                    </div>
+                  </Card>
+
+                  <Card>
+                    <Label icon={Target}>Targeting & Budget</Label>
+                    <div className="space-y-4">
+                      <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
+                      <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
+                        <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                        <p className="text-[10px] text-blue-700 font-medium">
+                          Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
+                    <div className="flex items-center gap-2 mb-6">
+                      <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
+                        <Zap size={20} />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
+                        <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
+                        <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
+                          <MousePointer2 size={8} /> Klik
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
+                        <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
+                        <p className="text-[9px] text-slate-400 font-bold mt-1">
+                          CVR {(adsSim.cvr * 100)}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-100">
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
+                        <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                        <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
+                        <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
+                      </div>
+                      <p className="text-[9px] text-slate-400 mt-3 text-center italic">
+                        *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
                       </p>
                     </div>
-                  </div>
-                </Card>
-
-                <Card>
-                  <Label icon={Target}>Targeting & Budget</Label>
-                  <div className="space-y-4">
-                    <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
-                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
-                      <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                      <p className="text-[10px] text-blue-700 font-medium">
-                        Estimasi Biaya per Klik (CPC) rata-rata untuk kategori makanan Anda adalah <span className="font-black">Rp {fNum(adsSim.cpc)}</span>.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-white/95 backdrop-blur-xl rounded-[32px] p-8 shadow-2xl border border-white/20">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="bg-emerald-100 p-2 rounded-xl text-emerald-600">
-                      <Zap size={20} />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6 mb-8">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
-                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
-                      <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
-                        <MousePointer2 size={8} /> Klik
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
-                      <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
-                      <p className="text-[9px] text-slate-400 font-bold mt-1">
-                        CVR {(adsSim.cvr * 100)}%
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-100">
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
-                      <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                      <span className="text-[10px] font-bold text-slate-500">ROAS (Return on Ad Spend)</span>
-                      <span className="text-sm font-black text-slate-800">{adsSim.roas.toFixed(1)}x</span>
-                    </div>
-                    <p className="text-[9px] text-slate-400 mt-3 text-center italic">
-                      *Estimasi berdasarkan rata-rata AOV Rp {fNum(adsSim.baseAOV)}. Hasil aktual dapat bervariasi.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1050,7 +1059,7 @@ export default function App() {
           </div>
         </nav>
 
-        {/* CHECKOUT BUTTON (Mobile Fixed) */}
+        {/* CHECKOUT BUTTON */}
         {page === 'checkout' && cart.length > 0 && (
           <div className="fixed bottom-[80px] left-0 right-0 max-w-md mx-auto px-4 z-50 md:hidden">
             <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-[24px] shadow-2xl shadow-emerald-600/40 transition-all active:scale-[0.98] flex justify-between items-center border-t border-emerald-400/30">
