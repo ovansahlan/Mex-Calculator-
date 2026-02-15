@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Styles untuk scrollbar atau override jika perlu */
+/* Custom styles di bawahnya boleh ada, boleh tidak */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #002a14;
+  background: linear-gradient(160deg, #004d22 0%, #002a14 100%);
+  color: #1a1a1a;
+  min-height: 100vh;
 }
