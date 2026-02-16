@@ -25,7 +25,8 @@ import {
   Target,    
   MousePointer2,
   ShoppingBag,
-  Activity // Icon baru untuk Diagnosa
+  Activity,
+  Eye // Icon baru untuk Impression
 } from 'lucide-react';
 
 // --- CONSTANTS ---
@@ -158,6 +159,7 @@ export default function App() {
   const [adsType, setAdsType] = useState('keyword'); 
   const [cpcBid, setCpcBid] = useState("2.500");
   const [adsCvr, setAdsCvr] = useState("15"); 
+  const [adsCtr, setAdsCtr] = useState("3.5"); // NEW: State for CTR
 
   const [localAppPrice, setLocalAppPrice] = useState("");
   const [isEditingAppPrice, setIsEditingAppPrice] = useState(false);
@@ -209,17 +211,20 @@ export default function App() {
     }));
   }, [scheme, tier]);
 
-  // REVISI: Reset CPC/CPO dan CVR saat tipe iklan ganti
+  // REVISI: Reset CPC/CPO, CVR dan CTR saat tipe iklan ganti
   useEffect(() => {
     if (adsType === 'keyword') {
       setCpcBid("2.500");
       setAdsCvr("15");
+      setAdsCtr("3.5"); // Default Keyword CTR
     } else if (adsType === 'banner') {
       setCpcBid("800");
       setAdsCvr("5");
+      setAdsCtr("1.2"); // Default Banner CTR
     } else if (adsType === 'cpo') {
-      setCpcBid("8.000"); // Default Cost Per Order
-      setAdsCvr("100"); // CVR tidak relevan untuk user di model CPO, tapi kita set 100 untuk visualisasi
+      setCpcBid("8.000"); 
+      setAdsCvr("100"); 
+      setAdsCtr("2.0"); // Visual placeholder for CPO
     }
   }, [adsType]);
 
@@ -390,42 +395,47 @@ export default function App() {
     };
   }, [histData, growthProj, checkout, futureCostPct]);
 
-  // REVISI: Logika AdsSim support CPO (Cost Per Order)
+  // REVISI: Logika AdsSim dengan Impressions
   const adsSim = useMemo(() => {
     const budget = pNum(adsBudget);
     const costUnit = pNum(cpcBid) || 0; // Bisa CPC atau CPO
     const cvrVal = pNum(adsCvr) || 0;
+    const ctrVal = pNum(adsCtr) || 0.1; // Default to small number to avoid div by 0
     const cvr = cvrVal / 100;
+    const ctr = ctrVal / 100;
     const baseAOV = pNum(histData.aov) || 40000;
 
-    let estClicks, estOrders, estGrossSales, roas, actualCost;
+    let estClicks, estOrders, estGrossSales, roas, actualCost, estImpressions;
 
     if (adsType === 'cpo') {
        // --- LOGIKA CPO ---
-       // User input budget & cost per order
-       // Order = Budget / Cost Per Order
        const cpo = costUnit || 10000;
        estOrders = Math.floor(budget / cpo);
-       actualCost = estOrders * cpo; // Biaya real yg dikeluarkan (bisa dibawah budget jika sisa tidak cukup untuk 1 order)
+       actualCost = estOrders * cpo; 
        estGrossSales = estOrders * baseAOV;
        
-       // Clicks dihitung mundur dari CVR (hanya simulasi)
-       // Jika CVR user input 100% (default CPO), clicks = orders. Jika user ganti, menyesuaikan.
-       estClicks = cvr > 0 ? Math.round(estOrders / (cvrVal > 99 ? 0.2 : cvr)) : 0; // Asumsi CVR normal 20% jika user set 100%
+       // Reverse engineering for CPO visualization:
+       // Orders -> (CVR) -> Clicks -> (CTR) -> Impressions
+       // If user sets 100% CVR for CPO, clicks = orders.
+       estClicks = cvr > 0 ? Math.round(estOrders / (cvrVal > 99 ? 0.2 : cvr)) : 0; 
+       estImpressions = ctr > 0 ? Math.round(estClicks / ctr) : 0;
        
        roas = actualCost > 0 ? (estGrossSales / actualCost) : 0;
     } else {
-       // --- LOGIKA CPC (Keyword/Banner) ---
+       // --- LOGIKA CPC ---
        const cpc = costUnit || (adsType === 'keyword' ? 2500 : 800);
        estClicks = Math.floor(budget / cpc);
        estOrders = Math.floor(estClicks * cvr);
-       actualCost = estClicks * cpc; // Asumsi budget habis
+       actualCost = estClicks * cpc;
        estGrossSales = estOrders * baseAOV;
        roas = budget > 0 ? (estGrossSales / budget) : 0;
+       
+       // Calculate Impressions
+       estImpressions = ctr > 0 ? Math.round(estClicks / ctr) : 0;
     }
 
-    return { cpc: costUnit, estClicks, cvr, estOrders, estGrossSales, roas, baseAOV, actualCost };
-  }, [adsBudget, adsType, histData.aov, cpcBid, adsCvr]);
+    return { cpc: costUnit, estClicks, cvr, ctrVal, estImpressions, estOrders, estGrossSales, roas, baseAOV, actualCost };
+  }, [adsBudget, adsType, histData.aov, cpcBid, adsCvr, adsCtr]);
 
   return (
     <div className="min-h-screen font-sans text-slate-900 pb-32 overflow-x-hidden flex justify-center bg-[#002a14]" 
@@ -1175,7 +1185,7 @@ export default function App() {
                     <div className="space-y-4">
                       <InputGroup label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
                       
-                      {/* NEW: Custom CPC & CVR Input */}
+                      {/* NEW: Custom CPC, CVR & CTR Input */}
                       <div className="flex gap-4">
                         <div className="flex-1">
                           <InputGroup 
@@ -1186,8 +1196,20 @@ export default function App() {
                             inputMode="numeric"
                           />
                         </div>
-                        {/* CVR Input disembunyikan jika tipe CPO karena kurang relevan buat user biasa */}
-                        {adsType !== 'cpo' && (
+                      </div>
+                      
+                      {/* CVR & CTR Inputs (Hidden for CPO simplicity unless advanced) */}
+                      {adsType !== 'cpo' && (
+                        <div className="flex gap-4">
+                          <div className="flex-1">
+                            <InputGroup 
+                              label="Est. CTR (%)" 
+                              suffix="%" 
+                              value={adsCtr} 
+                              onChange={(e) => setAdsCtr(e.target.value)} 
+                              inputMode="decimal"
+                            />
+                          </div>
                           <div className="flex-1">
                             <InputGroup 
                               label="Est. CVR (%)" 
@@ -1197,15 +1219,15 @@ export default function App() {
                               inputMode="decimal"
                             />
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
   
                       <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
                         <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
                         <p className="text-[10px] text-blue-700 font-medium">
                           {adsType === 'cpo' 
                             ? <span>Anda hanya akan ditagih <b>Rp {cpcBid}</b> setiap kali ada pesanan masuk dari iklan.</span>
-                            : <span>Default: CPC <span className="font-black">Rp {adsType === 'keyword' ? '2.500' : '800'}</span>, CVR <span className="font-black">{adsType === 'keyword' ? '15' : '5'}%</span>. Ubah untuk simulasi manual.</span>
+                            : <span>Default: CPC <span className="font-black">Rp {adsType === 'keyword' ? '2.500' : '800'}</span>, CTR <span className="font-black">{adsType === 'keyword' ? '3.5' : '1.2'}%</span>. Ubah untuk simulasi manual.</span>
                           }
                         </p>
                       </div>
@@ -1223,26 +1245,39 @@ export default function App() {
                         <span className="text-xs font-black uppercase tracking-widest text-slate-500">Estimasi Hasil Harian</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-6 mb-8">
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        {/* New: Impression */}
                         <div>
-                          {adsType === 'cpo' ? (
-                            <>
-                               <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Belanja Iklan</p>
-                               <p className="text-2xl font-black text-slate-800">Rp {fNum(adsSim.actualCost)}</p>
-                            </>
-                          ) : (
-                            <>
-                               <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
-                               <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
-                               <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
-                                 <MousePointer2 size={8} /> Klik
-                               </p>
-                            </>
-                          )}
+                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Tayangan</p>
+                           <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estImpressions)}</p>
+                           {adsType !== 'cpo' && (
+                             <p className="text-[9px] text-emerald-500 font-bold flex items-center gap-1 mt-1">
+                               <Eye size={10} /> CTR {adsSim.ctrVal}%
+                             </p>
+                           )}
                         </div>
+                        {/* Click */}
+                        <div className="text-right">
+                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik</p>
+                           <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estClicks)}</p>
+                           {adsType !== 'cpo' && (
+                             <p className="text-[9px] text-emerald-500 font-bold flex items-center justify-end gap-1 mt-1">
+                               <MousePointer2 size={10} /> Klik
+                             </p>
+                           )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6 mb-2 border-t border-slate-100 pt-4">
+                        {/* Cost/Left */}
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Biaya</p>
+                          <p className="text-xl font-black text-slate-800">Rp {fNum(adsSim.actualCost)}</p>
+                        </div>
+                        {/* Order/Right */}
                         <div className="text-right">
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Order</p>
-                          <p className="text-2xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
+                          <p className="text-xl font-black text-slate-800">{fNum(adsSim.estOrders)}</p>
                           {adsType !== 'cpo' && (
                             <p className="text-[9px] text-slate-400 font-bold mt-1">
                               CVR {(adsSim.cvr * 100).toFixed(0)}%
@@ -1252,7 +1287,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-100">
+                    <div className="pt-6 border-t-2 border-slate-100/80">
                       <div className="flex justify-between items-end mb-2">
                         <span className="text-xs font-black text-slate-400 uppercase">Potensi Omset</span>
                         <span className="text-2xl font-black text-emerald-600">Rp {fNum(adsSim.estGrossSales)}</span>
