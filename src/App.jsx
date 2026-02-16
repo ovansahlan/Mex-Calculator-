@@ -525,8 +525,37 @@ export default function App() {
                   </div>
                 </div>
                </>
+            ) : page === 'ads' ? (
+               // --- PANEL KHUSUS PAGE ADS ---
+               <>
+                {/* Panel 1: Jenis Iklan */}
+                <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px]">
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Jenis Iklan</p>
+                  <div className="font-black text-lg md:text-xl text-slate-700 tabular-nums leading-none uppercase">
+                    {adsType === 'cpo' ? 'Pesanan' : adsType}
+                  </div>
+                </div>
+
+                {/* Panel 2: Bid/Biaya */}
+                <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px]">
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    {adsType === 'cpo' ? 'Biaya/Order' : 'Bid CPC'}
+                  </p>
+                  <div className="font-black text-lg md:text-xl text-slate-700 tabular-nums leading-none">
+                    Rp {fNum(pNum(cpcBid))}
+                  </div>
+                </div>
+
+                {/* Panel 3: ROAS */}
+                <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px]">
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">ROAS</p>
+                  <div className={`font-black text-lg md:text-xl tabular-nums leading-none ${adsSim.roas >= 5 ? 'text-emerald-600' : adsSim.roas >= 3 ? 'text-blue-500' : 'text-rose-500'}`}>
+                    {adsSim.roas.toFixed(1)}x
+                  </div>
+                </div>
+               </>
             ) : (
-              // --- PANEL DEFAULT (CALC, ADS) ---
+              // --- PANEL DEFAULT (CALC) ---
               <>
                 {/* Panel 1: App Price */}
                 <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg p-3 flex flex-col items-center justify-center border border-white/40 h-[70px] relative group">
