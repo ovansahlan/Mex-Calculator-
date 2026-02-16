@@ -24,7 +24,8 @@ import {
   Megaphone, 
   Target,    
   MousePointer2,
-  ShoppingBag
+  ShoppingBag,
+  Activity // Icon baru untuk Diagnosa
 } from 'lucide-react';
 
 // --- CONSTANTS ---
@@ -39,6 +40,34 @@ const VOUCHERS = [
   { code: 'PUAS30', scheme: 'puas-cuan', label: 'Diskon Puas 30%', desc: 'Potongan 30%', disc: 30 },
   { code: 'PUAS35', scheme: 'booster', label: 'Diskon Puas 35%', desc: 'Potongan 35%', disc: 35 },
   { code: 'MITRA50', scheme: 'cofund', label: 'Diskon 40% (Patungan)', desc: 'Sharing Cost', disc: 40 }
+];
+
+// DATA METRIK UNTUK ADS
+const METRICS_GUIDE = [
+  {
+    metric: "CTR (Click-Through Rate)",
+    rows: [
+      { status: "Buruk", range: "< 1%", desc: "Daya tarik visual rendah. Foto menu tidak menggugah selera, judul kurang menarik, atau promo \"luar\" (yang kelihatan di feed) kurang kompetitif.", color: "text-rose-500", bg: "bg-rose-50" },
+      { status: "Sehat", range: "1.5% - 2.5%", desc: "Cukup relevan. Restomu sudah muncul di depan audiens yang tepat dengan visual yang standar industri.", color: "text-blue-500", bg: "bg-blue-50" },
+      { status: "Ideal", range: "> 3.5%", desc: "Sangat Menarik. Foto produk sangat kuat dan biasanya dibantu dengan promo \"diskon kilat\" yang bikin orang gatal ingin klik.", color: "text-emerald-600", bg: "bg-emerald-50" }
+    ]
+  },
+  {
+    metric: "CVR (Conversion Rate)",
+    rows: [
+      { status: "Buruk", range: "< 5%", desc: "Ada hambatan di dalam menu. Mungkin harga terlalu mahal, ongkir tidak masuk akal, atau kategori menu berantakan sehingga orang bingung mau pesan apa.", color: "text-rose-500", bg: "bg-rose-50" },
+      { status: "Sehat", range: "8% - 12%", desc: "Menu meyakinkan. Deskripsi jelas dan harga sesuai dengan ekspektasi konsumen saat melihat iklan.", color: "text-blue-500", bg: "bg-blue-50" },
+      { status: "Ideal", range: "> 15%", desc: "Mesin Penjual Otomatis. Promo di dalam toko (seperti Buy 1 Get 1 atau diskon ongkir) sangat efektif mengunci keputusan pembeli.", color: "text-emerald-600", bg: "bg-emerald-50" }
+    ]
+  },
+  {
+    metric: "ROAS (Return on Ad Spend)",
+    rows: [
+      { status: "Buruk", range: "< 2.5x", desc: "Bakar duit. Pendapatan dari iklan tidak cukup menutupi biaya bahan baku (COGS), komisi platform (20-30%), dan biaya iklan itu sendiri.", color: "text-rose-500", bg: "bg-rose-50" },
+      { status: "Sehat", range: "4x - 6x", desc: "Operasional aman. Kamu kemungkinan besar sudah balik modal (BEP) dan mulai mendapatkan margin tipis untuk operasional.", color: "text-blue-500", bg: "bg-blue-50" },
+      { status: "Ideal", range: "> 8x", desc: "Sangat Profitabel. Iklan bekerja sangat efisien. Setiap Rp1.000 yang kamu keluarkan menghasilkan Rp8.000+, yang berarti keuntungan bersih sudah cukup tebal.", color: "text-emerald-600", bg: "bg-emerald-50" }
+    ]
+  }
 ];
 
 // --- UTILS ---
@@ -1238,6 +1267,51 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* NEW: TABEL PANDUAN METRIK */}
+              <div className="mt-8">
+                <Card>
+                  <Label icon={Activity}>Panduan Metrik & Diagnosa</Label>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                      <thead>
+                        <tr className="border-b-2 border-slate-100">
+                          <th className="py-3 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest w-[120px]">Metrik</th>
+                          <th className="py-3 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest w-[80px]">Status</th>
+                          <th className="py-3 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest w-[100px]">Target</th>
+                          <th className="py-3 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Analisis & Diagnosa</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {METRICS_GUIDE.map((metricItem, mIdx) => (
+                          <React.Fragment key={mIdx}>
+                            {metricItem.rows.map((row, rIdx) => (
+                              <tr key={`${mIdx}-${rIdx}`} className="hover:bg-slate-50/50 transition-colors">
+                                {rIdx === 0 && (
+                                  <td rowSpan={3} className="py-3 px-2 align-top border-r border-slate-50">
+                                    <span className="text-xs font-black text-slate-700">{metricItem.metric}</span>
+                                  </td>
+                                )}
+                                <td className="py-3 px-2 align-top">
+                                  <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${row.bg} ${row.color}`}>
+                                    {row.status}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2 align-top">
+                                  <span className="text-xs font-bold text-slate-600">{row.range}</span>
+                                </td>
+                                <td className="py-3 px-2 align-top">
+                                  <p className="text-xs text-slate-500 leading-relaxed">{row.desc}</p>
+                                </td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               </div>
             </div>
           )}
