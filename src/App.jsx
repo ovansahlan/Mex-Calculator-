@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Fragment } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, 
   ComposedChart, Line, Cell, AreaChart, Area, PieChart, Pie, LineChart
 } from 'recharts';
 import { 
   UploadCloud, TrendingUp, Database, Filter, Megaphone,
-  Search, CheckCircle, AlertCircle, DollarSign, Activity, X, FileSpreadsheet,
-  Store, ArrowUpRight, ArrowDownRight, Minus, Users, Calendar, Info, ArrowLeft, ChevronRight, Zap, MapPin, Phone, Mail, Award, LayoutDashboard, Table, ShoppingBag, BarChart3, Target, PieChart as PieChartIcon, Percent, ExternalLink, Calculator as CalculatorIcon,
-  Home, ShoppingCart, ChevronLeft, Check, ArrowRight, Users2, Edit3, Settings, List, Tags, Wallet, Ticket, ChevronDown, Plus, MousePointer2, Eye, RefreshCw
+  Search, CheckCircle, AlertCircle, DollarSign, Activity, X,
+  Store, ArrowUpRight, ArrowDownRight, Minus, Users, Info, ArrowLeft, Zap, MapPin, Phone, Mail, Award, LayoutDashboard, Table, ShoppingBag, Target, Percent, ExternalLink, Calculator,
+  ShoppingCart, Check, ArrowRight, Settings, List, Tags, Ticket, ChevronDown, Plus, MousePointer, Eye, RefreshCw, BarChart2
 } from 'lucide-react';
 
 // --- FIREBASE IMPORTS ---
@@ -146,7 +146,7 @@ const SimKpiCard = ({ title, value, sub, valueColor = "text-slate-800", isClicka
   >
     <div className="flex justify-between items-start mb-2">
        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
-          {title} {isClickable && <MousePointer2 size={10} className="text-slate-300 group-hover:text-[#00B14F]"/>}
+          {title} {isClickable && <MousePointer size={10} className="text-slate-300 group-hover:text-[#00B14F]"/>}
        </p>
     </div>
     
@@ -354,7 +354,7 @@ const MerchantSimulator = () => {
                     <span className="font-bold">- Rp {fNum(calc.list - calc.pay)}</span>
                   </div>
                 ) : (
-                  <>
+                  <Fragment>
                     <div className="flex justify-between text-sm text-slate-500 font-medium">
                       <span>Komisi Grab ({inputs.kPct}%)</span>
                       <span className="font-bold text-slate-800">- Rp {fNum((calc.list - calc.mPromoCost) * (pNum(inputs.kPct)/100))}</span>
@@ -369,7 +369,7 @@ const MerchantSimulator = () => {
                       <span>Mex Investment</span>
                       <span className="font-bold">{calc.mexInvestPct.toFixed(1)}%</span>
                     </div>
-                  </>
+                  </Fragment>
                 )}
                 <div className="pt-4 border-t border-slate-200 flex justify-between items-end">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -388,14 +388,14 @@ const MerchantSimulator = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h2 className="text-lg md:text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                 <CalculatorIcon className="w-5 h-5 text-[#00B14F]"/> Merchant Simulator
+                 <Calculator className="w-5 h-5 text-[#00B14F]"/> Merchant Simulator
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">Simulasikan margin, harga coret, ongkir, hingga ROAS Ads.</p>
             </div>
             
             <div className="flex bg-slate-200/60 p-1.5 rounded-xl shrink-0 border border-slate-200 shadow-inner overflow-x-auto w-full sm:w-auto custom-scrollbar">
                <button onClick={() => setPage('calc')} className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${page === 'calc' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-                   <CalculatorIcon className="w-3.5 h-3.5" /> Margin
+                   <Calculator className="w-3.5 h-3.5" /> Margin
                </button>
                <button onClick={() => setPage('checkout')} className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${page === 'checkout' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                    <ShoppingCart className="w-3.5 h-3.5" /> Checkout {cart.length > 0 && <span className="bg-red-500 text-white w-3 h-3 rounded-full flex items-center justify-center text-[8px] ml-0.5">{cart.length}</span>}
@@ -412,32 +412,32 @@ const MerchantSimulator = () => {
         {/* DYNAMIC TOP PANELS */}
         <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
             {page === 'prospect' ? (
-              <>
+              <Fragment>
                 <SimKpiCard title="AOV Lama" value={`Rp ${fNum(projection.hAOV)}`} sub={`${fNum(projection.hOrders)} Order/Bulan`} valueColor="text-slate-600" />
                 <SimKpiCard title="AOV Baru (Est)" value={`Rp ${fNum(projection.newAOV)}`} sub={`${fNum(projection.pOrders)} Order/Bulan`} valueColor="text-emerald-600" />
                 <SimKpiCard title="Selisih Profit" value={`${projection.pNet >= projection.hNet ? '+' : ''}Rp ${fNum(projection.pNet - projection.hNet)}`} valueColor={projection.pNet >= projection.hNet ? 'text-blue-600' : 'text-rose-500'} />
-              </>
+              </Fragment>
             ) : page === 'checkout' ? (
-               <>
+               <Fragment>
                 <SimKpiCard title="Subtotal Cart" value={`Rp ${fNum(checkout.subtotal)}`} valueColor="text-slate-700" />
                 <SimKpiCard title="Promo Terpakai" value={activeVoucher ? activeVoucher.code : 'NORMAL'} valueColor={activeVoucher ? 'text-emerald-600' : 'text-slate-400'} />
                 <SimKpiCard title="Total Diskon" value={checkout.finalDisc > 0 ? `- Rp ${fNum(checkout.finalDisc)}` : '-'} valueColor="text-rose-500" />
-               </>
+               </Fragment>
             ) : page === 'ads' ? (
-               <>
+               <Fragment>
                 <SimKpiCard title="Model Ads" value={adsType === 'cpo' ? 'Pesanan' : adsType.toUpperCase()} valueColor="text-slate-700" />
                 <SimKpiCard title={adsType === 'cpo' ? 'Biaya/Order' : 'Bid CPC'} value={`Rp ${fNum(pNum(cpcBid))}`} valueColor="text-slate-700" />
                 <SimKpiCard title="Target ROAS" value={`${adsSim.roas.toFixed(1)}x`} valueColor={adsSim.roas >= 5 ? 'text-emerald-600' : adsSim.roas >= 3 ? 'text-blue-500' : 'text-rose-500'} />
-               </>
+               </Fragment>
             ) : (
-              <>
+              <Fragment>
                 <SimKpiCard title="Harga Aplikasi" value={`Rp ${fNum(calc.list)}`} valueColor="text-slate-800"
                    isEditing={isEditingAppPrice} editValue={localAppPrice} 
                    onEditChange={handleAppPriceManual} onEditFocus={() => { setIsEditingAppPrice(true); setLocalAppPrice(fNum(calc.list)); }} onEditBlur={() => { setIsEditingAppPrice(false); setLocalAppPrice(fNum(calc.list)); }}
                 />
                 <SimKpiCard title="Pax Pays (Bayar)" value={`Rp ${fNum(calc.pay)}`} sub={calc.list > calc.pay ? `Coret dari Rp ${fNum(calc.list)}` : 'Harga Normal'} valueColor="text-[#00B14F]" isClickable onClick={() => setActiveModal('cust')} />
                 <SimKpiCard title="Net Rev (Bersih)" value={`Rp ${fNum(calc.net)}`} sub={`Mex Inv: ${calc.mexInvestPct.toFixed(1)}%`} valueColor="text-blue-600" isClickable onClick={() => setActiveModal('net')} />
-              </>
+              </Fragment>
             )}
         </div>
 
@@ -489,7 +489,7 @@ const MerchantSimulator = () => {
                   <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-200">
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
-                        <Users2 size={16} className="text-blue-500" />
+                        <Users size={16} className="text-blue-500" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-blue-700">Mex Promo Share</span>
                       </div>
                       <span className="text-xs font-black bg-white text-blue-600 px-2.5 py-1 rounded-lg border border-blue-200 shadow-sm">{inputs.mShare}%</span>
@@ -561,10 +561,10 @@ const MerchantSimulator = () => {
                           </div>
                           <div className="text-right">
                              {checkout.ongkirDisc > 0 ? (
-                               <>
+                               <Fragment>
                                  <span className="block text-[10px] text-slate-400 line-through font-medium">Rp {fNum(id === 'prioritas' ? 15000 : id === 'standar' ? 10000 : 5000)}</span>
                                  <span className="block font-black text-sm text-emerald-600">Rp {fNum(Math.max(0, (id === 'prioritas' ? 15000 : id === 'standar' ? 10000 : 5000) - checkout.ongkirDisc))}</span>
-                               </>
+                               </Fragment>
                              ) : (
                                <span className="font-black text-sm text-slate-700">Rp {fNum(id === 'prioritas' ? 15000 : id === 'standar' ? 10000 : 5000)}</span>
                              )}
@@ -694,7 +694,7 @@ const MerchantSimulator = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
               <div className="space-y-6">
                 <div className="border border-slate-200 rounded-2xl p-4 md:p-5 bg-slate-50/50">
-                  <SimLabel icon={BarChart3}>1. Data Historis (Bulan Lalu)</SimLabel>
+                  <SimLabel icon={BarChart2}>1. Data Historis (Bulan Lalu)</SimLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <SimInputGroup label="Omset Penjualan" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
                     <SimInputGroup label="Jumlah Order" value={histData.orders} onChange={(e) => handleHistChange('orders', e.target.value)} />
@@ -825,7 +825,7 @@ const MerchantSimulator = () => {
                       <div>
                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. Klik (Traffic)</p>
                          <p className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">{fNum(adsSim.estClicks)}</p>
-                         {adsType !== 'cpo' && (<p className="text-[9px] text-slate-500 font-bold flex items-center gap-1 mt-1"><MousePointer2 size={10} className="text-[#00B14F]"/> Bayar jika diklik</p>)}
+                         {adsType !== 'cpo' && (<p className="text-[9px] text-slate-500 font-bold flex items-center gap-1 mt-1"><MousePointer size={10} className="text-[#00B14F]"/> Bayar jika diklik</p>)}
                       </div>
                       <div className="pt-4 border-t border-slate-100">
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Biaya Iklan</p>
@@ -868,7 +868,7 @@ const MerchantSimulator = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {METRICS_GUIDE.map((metricItem, mIdx) => (
-                        <React.Fragment key={mIdx}>
+                        <Fragment key={mIdx}>
                           {metricItem.rows.map((row, rIdx) => (
                             <tr key={`${mIdx}-${rIdx}`} className="hover:bg-slate-50 transition-colors">
                               {rIdx === 0 && (<td rowSpan={3} className="py-3 px-3 align-top border-r border-slate-50"><span className="text-xs font-black text-slate-800">{metricItem.metric}</span></td>)}
@@ -877,7 +877,7 @@ const MerchantSimulator = () => {
                               <td className="py-3 px-3 align-top"><p className="text-[11px] text-slate-500 leading-relaxed font-medium">{row.desc}</p></td>
                             </tr>
                           ))}
-                        </React.Fragment>
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -1412,7 +1412,7 @@ export default function App() {
                 {fileMaster && <div className="absolute top-2 right-2"><CheckCircle className="w-4 h-4 text-slate-800" /></div>}
               </div>
               <div className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50 relative group hover:border-slate-400 transition-all">
-                <BarChart3 className={`w-6 h-6 mb-2 ${fileHistory ? 'text-slate-800' : 'text-slate-400'}`} />
+                <BarChart2 className={`w-6 h-6 mb-2 ${fileHistory ? 'text-slate-800' : 'text-slate-400'}`} />
                 <p className="text-slate-700 font-bold text-xs mb-1">CSV Historis (Opsional)</p>
                 <p className="text-[10px] text-slate-400 text-center px-4">{fileHistory ? fileHistory.name : 'Data bulanan merchant'}</p>
                 <input type="file" accept=".csv" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => setFileHistory(e.target.files[0])} />
@@ -1460,7 +1460,7 @@ export default function App() {
 
              {/* TABS NAVIGATION (Desktop) */}
              {!selectedMex && (
-               <>
+               <Fragment>
                  <div className="hidden md:block w-px h-6 bg-slate-200 mx-1"></div>
                  <div className="hidden md:flex bg-slate-100/80 p-1.5 rounded-xl shrink-0 border border-slate-200/50">
                      <button onClick={() => { setActiveTab('overview'); setSearchTerm(''); }} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'overview' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
@@ -1471,10 +1471,10 @@ export default function App() {
                      </button>
                      {/* TAB SIMULATOR */}
                      <button onClick={() => setActiveTab('simulator')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'simulator' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
-                         <CalculatorIcon className="w-4 h-4" /> Simulator
+                         <Calculator className="w-4 h-4" /> Simulator
                      </button>
                  </div>
-               </>
+               </Fragment>
              )}
 
              {/* Back Button for Detail View */}
@@ -1545,7 +1545,7 @@ export default function App() {
                 <Table className="w-4 h-4" /> Data
             </button>
             <button onClick={() => setActiveTab('simulator')} className={`flex-none px-4 py-3 text-xs font-bold flex items-center justify-center gap-2 border-b-[3px] transition-all ${activeTab === 'simulator' ? 'border-[#00B14F] text-[#00B14F]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>
-                <CalculatorIcon className="w-4 h-4" /> Simulator
+                <Calculator className="w-4 h-4" /> Simulator
             </button>
           </div>
         )}
@@ -1577,7 +1577,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto relative w-full hide-scrollbar z-10 p-3 md:p-6 bg-slate-50">
         <div className="max-w-[1400px] mx-auto">
           {!selectedMex ? (
-            <>
+            <Fragment>
               {/* ========================================================= */}
               {/* TAB 1: DASHBOARD OVERVIEW */}
               {/* ========================================================= */}
@@ -1940,7 +1940,7 @@ export default function App() {
               {activeTab === 'simulator' && (
                 <MerchantSimulator />
               )}
-            </>
+            </Fragment>
           ) : (
             // =========================================================
             // VIEW MERCHANT DETAIL
@@ -2054,7 +2054,7 @@ export default function App() {
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
                         <div className="flex justify-between items-start mb-4">
                            <div className="flex items-center gap-2">
-                              <PieChartIcon className="w-4 h-4 text-rose-500"/>
+                              <Activity className="w-4 h-4 text-rose-500"/>
                               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Investment (MI)</h3>
                            </div>
                            <div className="bg-rose-50 px-2 py-0.5 rounded border border-rose-100 flex items-center gap-1">
