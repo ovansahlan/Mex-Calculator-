@@ -100,6 +100,7 @@ export default function App() {
   const [cpcBid, setCpcBid] = useState("2.500");
   const [adsCvr, setAdsCvr] = useState("15"); 
   const [adsCtr, setAdsCtr] = useState("3.5");
+  const [adsAov, setAdsAov] = useState("50.000"); // State baru untuk AOV khusus Iklan
 
   // --- STATE UNTUK EDIT HARGA APP ---
   const [localAppPrice, setLocalAppPrice] = useState("");
@@ -230,7 +231,7 @@ export default function App() {
     
     const cvr = cvrVal / 100; 
     const ctr = ctrVal / 100; 
-    const baseAOV = pNum(histData.aov) || 40000;
+    const baseAOV = pNum(adsAov) || 0; // Menggunakan adsAov alih-alih histData.aov
     
     let estClicks = 0, estOrders = 0, estGrossSales = 0, roas = 0, actualCost = 0, estImpressions = 0;
     let bidStatus = { label: 'Optimal', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
@@ -295,7 +296,7 @@ export default function App() {
     }
 
     return { cpc: inputBid, estClicks, cvr, ctrVal, estImpressions, estOrders, estGrossSales, roas, baseAOV, actualCost, bidStatus };
-  }, [adsBudget, adsType, histData.aov, cpcBid, adsCvr, adsCtr]);
+  }, [adsBudget, adsType, adsAov, cpcBid, adsCvr, adsCtr]); // Tambahkan adsAov ke dependency array
 
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden relative pb-32">
@@ -949,34 +950,53 @@ export default function App() {
               <SectionHeading icon={Activity} title="Pipeline Estimasi Harian" subtitle="Proyeksi perjalanan pembeli dari tayangan hingga pesanan." className="mb-8" />
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full">
-                {/* CTR & CVR moved back to Top next to ROAS */}
-                {adsType !== 'cpo' && (
-                  <div className="flex items-center gap-4 bg-zinc-950/50 border border-white/5 px-4 py-3 rounded-xl justify-center">
-                    <div className="text-center w-20 sm:w-24">
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Est. CTR</p>
-                      <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-md h-8 px-2 focus-within:border-blue-500/50 transition-colors">
-                        <input 
-                          type="number" inputMode="decimal"
-                          className="w-full bg-transparent border-none outline-none text-center font-semibold text-blue-400 text-sm"
-                          value={adsCtr} onChange={(e) => setAdsCtr(e.target.value)}
-                        />
-                        <span className="text-blue-500/50 font-bold text-xs ml-1">%</span>
-                      </div>
-                    </div>
-                    <div className="w-px h-8 bg-white/10"></div>
-                    <div className="text-center w-20 sm:w-24">
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Est. CVR</p>
-                      <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-md h-8 px-2 focus-within:border-emerald-500/50 transition-colors">
-                        <input 
-                          type="number" inputMode="decimal"
-                          className="w-full bg-transparent border-none outline-none text-center font-semibold text-emerald-400 text-sm"
-                          value={adsCvr} onChange={(e) => setAdsCvr(e.target.value)}
-                        />
-                        <span className="text-emerald-500/50 font-bold text-xs ml-1">%</span>
-                      </div>
+                
+                {/* AOV, CTR & CVR Metrics Group */}
+                <div className="flex items-center gap-4 bg-zinc-950/50 border border-white/5 px-4 py-3 rounded-xl justify-center">
+                  
+                  {/* Est. AOV (Selalu Ditampilkan) */}
+                  <div className="text-center w-28 sm:w-32">
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Est. AOV</p>
+                    <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-md h-8 px-2 focus-within:border-amber-500/50 transition-colors">
+                      <span className="text-amber-500/50 font-bold text-xs mr-1">Rp</span>
+                      <input 
+                        type="text" inputMode="numeric"
+                        className="w-full bg-transparent border-none outline-none text-center font-semibold text-amber-400 text-sm tabular-nums"
+                        value={adsAov} onChange={(e) => setAdsAov(fNum(pNum(e.target.value)))}
+                      />
                     </div>
                   </div>
-                )}
+
+                  {/* CTR & CVR (Hanya untuk CPC/Banner) */}
+                  {adsType !== 'cpo' && (
+                    <>
+                      <div className="w-px h-8 bg-white/10"></div>
+                      <div className="text-center w-20 sm:w-24">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Est. CTR</p>
+                        <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-md h-8 px-2 focus-within:border-blue-500/50 transition-colors">
+                          <input 
+                            type="number" inputMode="decimal"
+                            className="w-full bg-transparent border-none outline-none text-center font-semibold text-blue-400 text-sm"
+                            value={adsCtr} onChange={(e) => setAdsCtr(e.target.value)}
+                          />
+                          <span className="text-blue-500/50 font-bold text-xs ml-1">%</span>
+                        </div>
+                      </div>
+                      <div className="w-px h-8 bg-white/10"></div>
+                      <div className="text-center w-20 sm:w-24">
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Est. CVR</p>
+                        <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-md h-8 px-2 focus-within:border-emerald-500/50 transition-colors">
+                          <input 
+                            type="number" inputMode="decimal"
+                            className="w-full bg-transparent border-none outline-none text-center font-semibold text-emerald-400 text-sm"
+                            value={adsCvr} onChange={(e) => setAdsCvr(e.target.value)}
+                          />
+                          <span className="text-emerald-500/50 font-bold text-xs ml-1">%</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
 
                 {/* Highlighted ROAS */}
                 <div className="bg-zinc-950 px-6 py-3 rounded-xl flex items-center justify-center gap-6 border border-emerald-500/30 shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]">
