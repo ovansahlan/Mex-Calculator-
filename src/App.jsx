@@ -4,7 +4,7 @@ import {
   Settings, List, Tags, TrendingUp, BarChart3, Wallet, Ticket, 
   ChevronDown, AlertCircle, Plus, Minus, Megaphone, Target, 
   MousePointer2, ShoppingBag, Activity, Eye, Calculator, 
-  Receipt, Crosshair, BarChart, ChevronRight, Sparkles
+  Receipt, Crosshair, BarChart, ChevronRight, Sparkles, Edit3
 } from 'lucide-react';
 
 // --- CONSTANTS & DATA ---
@@ -18,20 +18,24 @@ const STRATEGY = {
 const VOUCHERS = [
   { code: 'CUAN', scheme: 'puas-cuan', label: 'Diskon Puas 30%', desc: 'Potongan 30%', disc: 30 },
   { code: 'BOOSTER', scheme: 'booster', label: 'Diskon Puas 35%', desc: 'Potongan 35%', disc: 35 },
-  { code: 'COFUND', scheme: 'cofund', label: 'Diskon 40% (Patungan)', desc: 'Sharing Cost', disc: 40 }
+  { code: 'KILAT50', scheme: 'booster', label: 'Diskon Kilat Booster', desc: 'Potongan 50% (Max 40rb)', disc: 50, overrideMin: 59000, overrideMax: 40000 },
+  { code: 'COFUND20', scheme: 'cofund', label: 'Diskon 20% (Patungan)', desc: 'Sharing Cost', disc: 20 },
+  { code: 'COFUND40', scheme: 'cofund', label: 'Diskon 40% (Patungan)', desc: 'Sharing Cost', disc: 40 },
+  { code: 'COFUND50', scheme: 'cofund', label: 'Diskon 50% (Patungan)', desc: 'Sharing Cost', disc: 50 }
 ];
 
 const METRICS_GUIDE = [
   { metric: "Click-Through Rate (CTR)", rows: [ { status: "Buruk", range: "< 1%", desc: "Foto kurang menarik, butuh perbaikan visual.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "1.5% - 2.5%", desc: "Tampil di audiens yang tepat.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 3.5%", desc: "Foto kuat & promo memicu klik.", color: "text-emerald-600", bg: "bg-emerald-50" } ] },
   { metric: "Conversion Rate (CVR)", rows: [ { status: "Buruk", range: "< 5%", desc: "Harga/ongkir tinggi, ada hambatan konversi.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "8% - 12%", desc: "Harga sesuai ekspektasi pasar.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 15%", desc: "Mesin penjual efektif.", color: "text-emerald-600", bg: "bg-emerald-50" } ] },
-  { metric: "Return on Ad Spend (ROAS)", rows: [ { status: "Buruk", range: "< 2.5x", desc: "Bakar duit. Pendapatan tidak menutupi biaya operasional & iklan.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "4x - 6x", desc: "Operasional aman. Balik modal (BEP) dan mulai mendapat margin tipis.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 8x", desc: "Sangat Profitabel. Iklan efisien, keuntungan bersih sangat tebal.", color: "text-emerald-600", bg: "bg-emerald-50" } ] }
+  { metric: "Return on Ad Spend (ROAS)", rows: [ { status: "Buruk", range: "< 2.5x", desc: "Rugi operasional, evaluasi strategi.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "4x - 6x", desc: "BEP & mulai mendapat margin tipis.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 8x", desc: "Iklan efisien, margin sangat tebal.", color: "text-emerald-600", bg: "bg-emerald-50" } ] }
 ];
 
 const COFUND_PRESETS = [
-  { id: 'p40_50', label: 'Cofund 40% (Beban Toko 50%)', vDisk: 40, mShare: 50 },
   { id: 'p50_60', label: 'Cofund 50% (Beban Toko 60%)', vDisk: 50, mShare: 60 },
+  { id: 'p40_50', label: 'Cofund 40% (Beban Toko 50%)', vDisk: 40, mShare: 50 },
   { id: 'p35_50', label: 'Cofund 35% (Beban Toko 50%)', vDisk: 35, mShare: 50 },
-  { id: 'p30_40', label: 'Cofund 30% (Beban Toko 40%)', vDisk: 30, mShare: 40 }
+  { id: 'p30_40', label: 'Cofund 30% (Beban Toko 40%)', vDisk: 30, mShare: 40 },
+  { id: 'p20_30', label: 'Cofund 20% (Beban Toko 30%)', vDisk: 20, mShare: 30 }
 ];
 
 // --- UTILS ---
@@ -124,6 +128,27 @@ export default function App() {
   const [deliveryType, setDeliveryType] = useState('prioritas');
   const [showVoucherDropdown, setShowVoucherDropdown] = useState(false);
 
+  // --- REVERSE CALCULATION LOGIC ---
+  const handleAppPriceManualChange = (val) => {
+    const newAppPrice = pNum(val);
+    const k = pNum(inputs.kPct) / 100;
+    const subRaw = pNum(inputs.subVal);
+    
+    let newOfflinePrice = 0;
+    if (subMode === 'val') {
+      // Formula: L = (O - S) / (1-k)  => O = L(1-k) + S
+      newOfflinePrice = newAppPrice * (1 - k) + subRaw;
+    } else {
+      // Formula: L = (O * (1 - S%)) / (1-k) => O = (L(1-k)) / (1-S%)
+      const sPct = subRaw / 100;
+      if (sPct < 1) {
+        newOfflinePrice = (newAppPrice * (1 - k)) / (1 - sPct);
+      }
+    }
+    
+    setInputs(prev => ({ ...prev, mainVal: fNum(Math.round(newOfflinePrice)) }));
+  };
+
   // Core calculations logic
   const calc = useMemo(() => {
     const off = pNum(inputs.mainVal); const subRaw = pNum(inputs.subVal); const actSub = subMode === 'val' ? subRaw : (off * subRaw / 100);
@@ -193,8 +218,14 @@ export default function App() {
 
     if (activeVoucher) {
       schemeKey = activeVoucher.scheme; const conf = STRATEGY[schemeKey];
-      if (conf.tiers && conf.tiers[tier]) { limitMin = conf.tiers[tier].min; limitMax = conf.tiers[tier].max; } 
-      else if (schemeKey === 'cofund') { limitMin = pNum(inputs.minO); limitMax = pNum(inputs.mDisk) || Infinity; }
+      
+      if (activeVoucher.overrideMin !== undefined) {
+        limitMin = activeVoucher.overrideMin; limitMax = activeVoucher.overrideMax;
+      } else if (conf.tiers && conf.tiers[tier]) { 
+        limitMin = conf.tiers[tier].min; limitMax = conf.tiers[tier].max; 
+      } else if (schemeKey === 'cofund') { 
+        limitMin = pNum(inputs.minO); limitMax = pNum(inputs.mDisk) || Infinity; 
+      }
 
       if (subtotal >= limitMin) {
         totalPotDisc = Math.min(Math.round(subtotal * (activeVoucher.disc / 100)), limitMax);
@@ -299,7 +330,7 @@ export default function App() {
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-100 bg-gray-50 -mx-8 -mb-8 p-8 rounded-b-[32px]">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                 {activeModal === 'cust' ? 'Total Dibayar Pembeli' : 'Diterima Resto (Net)'}
               </p>
               <p className={`text-4xl font-extrabold tracking-tight ${activeModal === 'cust' ? 'text-gray-900' : 'text-emerald-600'}`}>
@@ -362,12 +393,22 @@ export default function App() {
             
             {/* HERO KPI CARDS */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-               <BentoCard accent="slate" className="flex flex-col text-left !p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Harga App</p>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500"><Tags size={14}/></div>
+               <BentoCard accent="slate" className="flex flex-col text-left !p-6 relative group">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Harga Aplikasi</p>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:text-emerald-500 transition-colors"><Edit3 size={14}/></div>
                   </div>
-                  <p className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Rp {fNum(calc.list)}</p>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl font-bold text-gray-400 pt-1">Rp</span>
+                    <input 
+                      type="text"
+                      inputMode="numeric"
+                      className="bg-transparent border-none outline-none text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight w-full tabular-nums"
+                      value={fNum(calc.list)}
+                      onChange={(e) => handleAppPriceManualChange(e.target.value)}
+                    />
+                  </div>
+                  <p className="text-[9px] font-medium text-gray-400 mt-2 italic group-hover:text-emerald-500 transition-colors">*Bisa diedit untuk hitung balik harga offline</p>
                </BentoCard>
 
                <BentoCard clickable accent="blue" onClick={() => setActiveModal('cust')} className="flex flex-col text-left !p-6 group">
@@ -759,7 +800,7 @@ export default function App() {
                         <p className="text-[11px] font-semibold text-emerald-700/70 uppercase tracking-wider">Est. Biaya</p>
                         <div className="flex items-center bg-white border border-gray-200 shadow-sm rounded-[8px] px-2 py-0.5">
                            <input type="number" value={futureCostPct} onChange={(e) => setFutureCostPct(e.target.value)} className="bg-transparent text-gray-900 font-bold text-sm w-8 outline-none text-center" />
-                           <span className="text-[10px] font-medium text-gray-500">%</span>
+                           <span className="text-[10px] font-medium text-gray-400">%</span>
                         </div>
                       </div>
                       <p className="text-lg font-bold text-rose-500">Rp {fNum(projection.pInvestTotal)}</p>
@@ -906,7 +947,7 @@ export default function App() {
                       </div>
                       <div className="bg-white border border-emerald-100 p-4 rounded-[16px] flex justify-between items-center shadow-sm">
                         <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">Return on Ad Spend</span>
-                        <span className={`text-lg font-extrabold ${adsSim.roas >= 5 ? 'text-emerald-600' : adsSim.roas >= 3 ? 'text-blue-500' : 'text-rose-500'}`}>{adsSim.roas.toFixed(1)}x ROAS</span>
+                        <span className={`text-lg font-extrabold ${adsSim.roas >= 5 ? 'text-[#00B14F]' : adsSim.roas >= 3 ? 'text-blue-500' : 'text-rose-500'}`}>{adsSim.roas.toFixed(1)}x ROAS</span>
                       </div>
                     </div>
                 </BentoCard>
