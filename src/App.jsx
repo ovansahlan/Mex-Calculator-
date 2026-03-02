@@ -24,7 +24,7 @@ const VOUCHERS = [
 const METRICS_GUIDE = [
   { metric: "Click-Through Rate (CTR)", rows: [ { status: "Buruk", range: "< 1%", desc: "Foto kurang menarik, butuh perbaikan visual.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "1.5% - 2.5%", desc: "Tampil di audiens yang tepat.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 3.5%", desc: "Foto kuat & promo memicu klik.", color: "text-emerald-600", bg: "bg-emerald-50" } ] },
   { metric: "Conversion Rate (CVR)", rows: [ { status: "Buruk", range: "< 5%", desc: "Harga/ongkir tinggi, ada hambatan konversi.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "8% - 12%", desc: "Harga sesuai ekspektasi pasar.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 15%", desc: "Mesin penjual efektif.", color: "text-emerald-600", bg: "bg-emerald-50" } ] },
-  { metric: "Return on Ad Spend (ROAS)", rows: [ { status: "Buruk", range: "< 2.5x", desc: "Rugi operasional, evaluasi strategi.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "4x - 6x", desc: "BEP & mulai mendapat margin tipis.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 8x", desc: "Iklan efisien, margin sangat tebal.", color: "text-emerald-600", bg: "bg-emerald-50" } ] }
+  { metric: "Return on Ad Spend (ROAS)", rows: [ { status: "Buruk", range: "< 2.5x", desc: "Bakar duit. Pendapatan tidak menutupi biaya operasional & iklan.", color: "text-rose-600", bg: "bg-rose-50" }, { status: "Sehat", range: "4x - 6x", desc: "Operasional aman. Balik modal (BEP) dan mulai mendapat margin tipis.", color: "text-blue-600", bg: "bg-blue-50" }, { status: "Ideal", range: "> 8x", desc: "Sangat Profitabel. Iklan efisien, keuntungan bersih sangat tebal.", color: "text-emerald-600", bg: "bg-emerald-50" } ] }
 ];
 
 const COFUND_PRESETS = [
@@ -310,8 +310,8 @@ export default function App() {
         </div>
       )}
 
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-[#F8F9FA]/80 backdrop-blur-xl border-b border-gray-200/80 mb-6 md:mb-8 transition-all duration-300">
+      {/* FIXED HEADER */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#F8F9FA]/80 backdrop-blur-xl border-b border-gray-200/80 transition-all duration-300">
         <div className="px-6 py-4 md:py-5 max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-200/60 flex items-center justify-center">
@@ -347,6 +347,9 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* Spacer to prevent content from hiding under the fixed header */}
+      <div className="h-36 md:h-28"></div>
 
       {/* MAIN CONTENT AREA */}
       <main className="relative z-10 max-w-[1200px] mx-auto px-4 md:px-6 w-full animate-fade-in">
@@ -642,7 +645,7 @@ export default function App() {
                             </div>
                           </div>
                           {VOUCHERS.map((v, i) => (
-                            <div key={i} className="p-3 hover:bg-amber-50 rounded-[14px] cursor-pointer transition-colors mb-1 last:mb-0" onClick={() => selectVoucher(v)}>
+                            <div key={i} className="p-3 hover:bg-emerald-50 rounded-[14px] cursor-pointer transition-colors mb-1 last:mb-0" onClick={() => selectVoucher(v)}>
                               <div className="flex justify-between items-center">
                                 <div>
                                   <p className="text-sm font-bold text-amber-600 tracking-wide mb-0.5">{v.code}</p>
@@ -676,7 +679,7 @@ export default function App() {
                       <div className="flex justify-between text-sm text-gray-500"><span>Ongkos Kirim</span><span className="text-gray-900 font-bold">Rp {fNum(checkout.finalOngkir)}</span></div>
                       <div className="flex justify-between text-sm text-gray-500"><span>Biaya Platform</span><span className="text-gray-900 font-bold">Rp 1.500</span></div>
                       {checkout.finalDisc > 0 && (
-                        <div className="flex justify-between text-sm font-bold text-emerald-600 pt-5 border-t border-emerald-100 border-dashed">
+                        <div className="flex justify-between text-sm font-bold text-emerald-600 pt-5 border-t border-gray-200">
                           <span className="flex items-center gap-2"><Zap size={16}/> Potongan Promo</span>
                           <span>- Rp {fNum(checkout.finalDisc)}</span>
                         </div>
@@ -756,7 +759,7 @@ export default function App() {
                         <p className="text-[11px] font-semibold text-emerald-700/70 uppercase tracking-wider">Est. Biaya</p>
                         <div className="flex items-center bg-white border border-gray-200 shadow-sm rounded-[8px] px-2 py-0.5">
                            <input type="number" value={futureCostPct} onChange={(e) => setFutureCostPct(e.target.value)} className="bg-transparent text-gray-900 font-bold text-sm w-8 outline-none text-center" />
-                           <span className="text-[10px] font-medium text-gray-400">%</span>
+                           <span className="text-[10px] font-medium text-gray-500">%</span>
                         </div>
                       </div>
                       <p className="text-lg font-bold text-rose-500">Rp {fNum(projection.pInvestTotal)}</p>
