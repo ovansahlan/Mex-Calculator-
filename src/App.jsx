@@ -10,8 +10,8 @@ import {
 // --- CONSTANTS & DATA ---
 const STRATEGY = {
   'normal': { k: 20, v: 0, tiers: null, title: 'NORMAL', subtitle: 'Basic Plan', benefits: ['Margin Aman 100%', ] },
-  'puas-cuan': { k: 32, v: 30, tiers: { hemat: { max: 45000, min: 15000 }, ekstra: { max: 80000, min: 35000 } }, title: 'CUAN 32%', subtitle: 'High Volume', benefits: ['Always on Promo', 'In App Exposure'] },
-  'booster': { k: 38, v: 35, tiers: { hemat: { max: 55000, min: 15000 }, ekstra: { max: 100000, min: 35000 } }, title: 'BOOSTER 38%', subtitle: 'Max Exposure', benefits: ['FLASH SALE 50%', 'Always on Promo','In App Exposure'] },
+  'puas-cuan': { k: 32, v: 30, tiers: { hemat: { max: 45000, min: 15000 }, ekstra: { max: 80000, min: 35000 } }, title: 'CUAN 32%', subtitle: 'High Volume', benefits: ['Always on Promo 30%', 'In App Exposure'] },
+  'booster': { k: 38, v: 35, tiers: { hemat: { max: 55000, min: 15000 }, ekstra: { max: 100000, min: 35000 } }, title: 'BOOSTER 38%', subtitle: 'Max Exposure', benefits: ['FLASH SALE 50%', 'Always on Promo 35%','In App Exposure'] },
   'cofund': { k: 20, v: 40, tiers: null, title: 'COFUND', subtitle: 'Partnership', benefits: ['Patungan Diskon'] }
 };
 
@@ -40,17 +40,37 @@ const pNum = (n) => { if (typeof n === 'number') return n; if (!n) return 0; ret
 const pFloat = (n) => { if (typeof n === 'number') return n; if (!n) return 0; return parseFloat(n.toString().replace(/,/g, '.').replace(/[^0-9.]/g, '')) || 0; };
 
 // --- BENTO MINIMALIST COMPONENTS ---
-const BentoCard = ({ children, className = "", onClick, clickable = false, highlighted = false }) => (
-  <div 
-    onClick={onClick}
-    className={`bg-white rounded-[28px] p-6 md:p-8 transition-all duration-300 border
-      ${highlighted ? 'border-emerald-500/50 shadow-[0_15px_50px_-12px_rgba(16,185,129,0.35)] ring-1 ring-emerald-50' : 'border-gray-200/70 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)]'} 
-      ${clickable ? 'cursor-pointer hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] hover:-translate-y-1.5 hover:border-gray-300' : ''} 
-      ${className}`}
-  >
-    {children}
-  </div>
-);
+const BentoCard = ({ children, className = "", onClick, clickable = false, accent = "slate" }) => {
+  const accentStyles = {
+    emerald: 'border-emerald-500/40 shadow-[0_15px_40px_-12px_rgba(16,185,129,0.15)] ring-1 ring-emerald-50/50',
+    blue: 'border-blue-500/40 shadow-[0_15px_40px_-12px_rgba(59,130,246,0.15)] ring-1 ring-blue-50/50',
+    amber: 'border-amber-500/40 shadow-[0_15px_40px_-12px_rgba(245,158,11,0.15)] ring-1 ring-amber-50/50',
+    rose: 'border-rose-500/40 shadow-[0_15px_40px_-12px_rgba(244,63,94,0.15)] ring-1 ring-rose-50/50',
+    slate: 'border-gray-200 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)]'
+  };
+
+  const topStrip = {
+    emerald: 'bg-emerald-500',
+    blue: 'bg-blue-500',
+    amber: 'bg-amber-500',
+    rose: 'bg-rose-500',
+    slate: 'bg-gray-200'
+  };
+
+  return (
+    <div 
+      onClick={onClick}
+      className={`bg-white rounded-[28px] p-6 md:p-8 transition-all duration-300 border relative overflow-hidden
+        ${accentStyles[accent] || accentStyles.slate} 
+        ${clickable ? 'cursor-pointer hover:shadow-xl hover:-translate-y-1.5' : ''} 
+        ${className}`}
+    >
+      {/* Decorative top strip for visual identity */}
+      <div className={`absolute top-0 left-0 right-0 h-[4px] ${topStrip[accent] || topStrip.slate} opacity-60`}></div>
+      {children}
+    </div>
+  );
+};
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-start gap-4 mb-6">
@@ -245,7 +265,7 @@ export default function App() {
                <h3 className="font-bold text-xs uppercase tracking-widest text-gray-500">
                  {activeModal === 'cust' ? 'Struk Pelanggan' : 'Estimasi Net Resto'}
                </h3>
-               <button onClick={() => setActiveModal(null)} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">✕</button>
+               <button onClick={() => setActiveModal(null)} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors">✕</button>
             </div>
             
             <div className="space-y-4 font-medium text-gray-600">
@@ -339,7 +359,7 @@ export default function App() {
             
             {/* HERO KPI CARDS */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-               <BentoCard className="flex flex-col text-left !p-6">
+               <BentoCard accent="slate" className="flex flex-col text-left !p-6">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Harga App</p>
                     <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500"><Tags size={14}/></div>
@@ -347,15 +367,15 @@ export default function App() {
                   <p className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Rp {fNum(calc.list)}</p>
                </BentoCard>
 
-               <BentoCard clickable onClick={() => setActiveModal('cust')} className="flex flex-col text-left !p-6 group">
+               <BentoCard clickable accent="blue" onClick={() => setActiveModal('cust')} className="flex flex-col text-left !p-6 group">
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Bayar (Cust)</p>
+                    <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest">Bayar (Cust)</p>
                     <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform"><ShoppingCart size={14}/></div>
                   </div>
                   <p className="text-2xl md:text-3xl font-extrabold text-blue-600 tracking-tight">Rp {fNum(calc.pay)}</p>
                </BentoCard>
 
-               <BentoCard clickable highlighted onClick={() => setActiveModal('net')} className="flex flex-col text-left !p-6 group relative">
+               <BentoCard clickable accent="emerald" onClick={() => setActiveModal('net')} className="flex flex-col text-left !p-6 group relative">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">Net (Resto)</p>
                     <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform"><Wallet size={14}/></div>
@@ -369,7 +389,7 @@ export default function App() {
                </BentoCard>
             </div>
 
-            <BentoCard>
+            <BentoCard accent="emerald">
               <SectionHeader icon={Sparkles} title="Strategi Campaign" subtitle="Pilih skema promo untuk mengkalkulasi margin otomatis." />
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
@@ -479,7 +499,7 @@ export default function App() {
             </BentoCard>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              <BentoCard>
+              <BentoCard accent="slate">
                 <SectionHeader icon={List} title="Data Menu" subtitle="Harga dasar dan mark-up aplikasi." />
                 <div className="space-y-5">
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -509,7 +529,7 @@ export default function App() {
                 </div>
               </BentoCard>
 
-              <BentoCard>
+              <BentoCard accent="slate">
                 <SectionHeader icon={Settings} title="Parameter Sistem" subtitle="Konfigurasi batas hitungan." />
                 <div className="grid grid-cols-2 gap-4 md:gap-6">
                   <MinimalInput label="Komisi" suffix="%" value={inputs.kPct} type="number" onChange={(e) => handleInputChange('kPct', e.target.value)} />
@@ -529,24 +549,24 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-stretch">
             
             <div className="lg:col-span-7 flex flex-col gap-6 md:gap-8">
-              <BentoCard>
+              <BentoCard accent="blue">
                 <SectionHeader icon={Info} title="Opsi Pengiriman" subtitle="Kecepatan mempengaruhi harga ongkir." />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {['prioritas', 'standar', 'hemat'].map(id => {
                      const isSelected = deliveryType === id;
                      const baseOngkir = id === 'prioritas' ? 15000 : id === 'standar' ? 10000 : 5000;
                      return (
-                        <div key={id} onClick={() => setDeliveryType(id)} className={`relative p-5 rounded-[20px] cursor-pointer transition-all duration-300 flex flex-col justify-between h-32 border ${isSelected ? 'bg-emerald-50/50 border-emerald-500 shadow-sm ring-1 ring-emerald-500/20' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                        <div key={id} onClick={() => setDeliveryType(id)} className={`relative p-5 rounded-[20px] cursor-pointer transition-all duration-300 flex flex-col justify-between h-32 border ${isSelected ? 'bg-blue-50/50 border-blue-500 shadow-sm ring-1 ring-blue-500/20' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
                            <div className="flex justify-between items-start">
-                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-emerald-500' : 'border-gray-300'}`}>
-                               {isSelected && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"/>}
+                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-blue-500' : 'border-gray-300'}`}>
+                               {isSelected && <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"/>}
                              </div>
                              <span className="text-[10px] text-gray-500 font-bold uppercase bg-gray-100 px-2 py-0.5 rounded-[6px]">
                                {id === 'prioritas' ? '20m' : id === 'standar' ? '30m' : '45m'}
                              </span>
                            </div>
                            <div>
-                             <h4 className={`font-extrabold uppercase tracking-widest text-sm mb-0.5 ${isSelected ? 'text-emerald-700' : 'text-gray-700'}`}>{id}</h4>
+                             <h4 className={`font-extrabold uppercase tracking-widest text-sm mb-0.5 ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>{id}</h4>
                              {checkout.ongkirDisc > 0 ? (
                                <div className="flex items-center gap-2">
                                  <span className="text-[10px] text-gray-400 line-through font-medium">Rp {fNum(baseOngkir)}</span>
@@ -562,10 +582,10 @@ export default function App() {
                 </div>
               </BentoCard>
 
-              <BentoCard className="flex-1 flex flex-col">
+              <BentoCard accent="emerald" className="flex-1 flex flex-col">
                 <div className="flex justify-between items-center mb-6 shrink-0">
                   <SectionHeader icon={ShoppingBag} title="Keranjang Belanja" subtitle="Daftar menu yang telah disimulasikan." />
-                  <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-[8px] text-[11px] font-bold">{cart.reduce((a,b)=>a+b.qty,0)} Items</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-[8px] text-[11px] font-bold">{cart.reduce((a,b)=>a+b.qty,0)} Items</span>
                 </div>
                 
                 <div className="space-y-3 flex-1">
@@ -598,19 +618,19 @@ export default function App() {
             </div>
 
             <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8">
-               <BentoCard className="!p-0 z-20 overflow-visible shrink-0">
+               <BentoCard accent="amber" className="!p-0 z-20 overflow-visible shrink-0">
                   <div className="p-6 md:p-8">
                     <SectionHeader icon={Ticket} title="Promo & Voucher" subtitle="Terapkan skema diskon." />
                     <div className="relative">
-                      <button onClick={() => setShowVoucherDropdown(!showVoucherDropdown)} className={`w-full p-4 rounded-[20px] flex justify-between items-center transition-all border ${activeVoucher ? 'bg-emerald-50 border-emerald-500 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                      <button onClick={() => setShowVoucherDropdown(!showVoucherDropdown)} className={`w-full p-4 rounded-[20px] flex justify-between items-center transition-all border ${activeVoucher ? 'bg-amber-50 border-amber-500 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
                         <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center ${activeVoucher ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'}`}><Ticket size={18} /></div>
+                          <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center ${activeVoucher ? 'bg-amber-500 text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}><Ticket size={18} /></div>
                           <div className="text-left">
-                            <p className={`text-sm font-extrabold uppercase tracking-wide ${activeVoucher ? 'text-emerald-700' : 'text-gray-700'}`}>{activeVoucher ? activeVoucher.code : 'Pilih Promo'}</p>
-                            <p className={`text-[11px] font-medium mt-0.5 ${activeVoucher ? 'text-emerald-600' : 'text-gray-500'}`}>{activeVoucher ? activeVoucher.label : 'Makin hemat'}</p>
+                            <p className={`text-sm font-extrabold uppercase tracking-wide ${activeVoucher ? 'text-amber-700' : 'text-gray-700'}`}>{activeVoucher ? activeVoucher.code : 'Pilih Promo'}</p>
+                            <p className={`text-[11px] font-medium mt-0.5 ${activeVoucher ? 'text-amber-600' : 'text-gray-500'}`}>{activeVoucher ? activeVoucher.label : 'Makin hemat'}</p>
                           </div>
                         </div>
-                        <ChevronDown size={20} className={`transition-transform duration-300 ${showVoucherDropdown ? 'rotate-180' : ''} ${activeVoucher ? 'text-emerald-600' : 'text-gray-500'}`}/>
+                        <ChevronDown size={20} className={`transition-transform duration-300 ${showVoucherDropdown ? 'rotate-180' : ''} ${activeVoucher ? 'text-amber-600' : 'text-gray-500'}`}/>
                       </button>
 
                       {showVoucherDropdown && (
@@ -622,13 +642,13 @@ export default function App() {
                             </div>
                           </div>
                           {VOUCHERS.map((v, i) => (
-                            <div key={i} className="p-3 hover:bg-emerald-50 rounded-[14px] cursor-pointer transition-colors mb-1 last:mb-0" onClick={() => selectVoucher(v)}>
+                            <div key={i} className="p-3 hover:bg-amber-50 rounded-[14px] cursor-pointer transition-colors mb-1 last:mb-0" onClick={() => selectVoucher(v)}>
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <p className="text-sm font-bold text-emerald-600 tracking-wide mb-0.5">{v.code}</p>
+                                  <p className="text-sm font-bold text-amber-600 tracking-wide mb-0.5">{v.code}</p>
                                   <p className="text-[10px] text-gray-500">{v.label}</p>
                                 </div>
-                                {activeVoucher?.code === v.code && <Check size={18} strokeWidth={3} className="text-emerald-500" />}
+                                {activeVoucher?.code === v.code && <Check size={18} strokeWidth={3} className="text-amber-500" />}
                               </div>
                             </div>
                           ))}
@@ -637,7 +657,7 @@ export default function App() {
                     </div>
                     
                     {activeVoucher && (
-                      <div className="mt-5 bg-gray-50 border border-gray-100 rounded-[16px] p-4">
+                      <div className="mt-5 bg-amber-50/50 border border-amber-100 rounded-[16px] p-4">
                         <div className="flex justify-between text-xs mb-2 font-medium"><span className="text-gray-500">Min. Order</span><span className="font-bold text-gray-900">Rp {fNum(checkout.limitMin)}</span></div>
                         <div className="flex justify-between text-xs font-medium"><span className="text-gray-500">Max. Diskon</span><span className="font-bold text-gray-900">{checkout.limitMax === Infinity ? 'Tanpa Batas' : `Rp ${fNum(checkout.limitMax)}`}</span></div>
                         {!checkout.thresholdMet && (
@@ -650,20 +670,20 @@ export default function App() {
                   </div>
                </BentoCard>
 
-               <BentoCard className="flex-1 flex flex-col bg-gray-50/80 !border-gray-200">
+               <BentoCard accent="emerald" className="flex-1 flex flex-col bg-gray-50/80 !border-emerald-500/20">
                   <div className="space-y-4 mb-8 font-medium">
                       <div className="flex justify-between text-sm text-gray-500"><span>Subtotal Menu</span><span className="text-gray-900 font-bold">Rp {fNum(checkout.subtotal)}</span></div>
                       <div className="flex justify-between text-sm text-gray-500"><span>Ongkos Kirim</span><span className="text-gray-900 font-bold">Rp {fNum(checkout.finalOngkir)}</span></div>
                       <div className="flex justify-between text-sm text-gray-500"><span>Biaya Platform</span><span className="text-gray-900 font-bold">Rp 1.500</span></div>
                       {checkout.finalDisc > 0 && (
-                        <div className="flex justify-between text-sm font-bold text-emerald-600 pt-5 border-t border-gray-200">
+                        <div className="flex justify-between text-sm font-bold text-emerald-600 pt-5 border-t border-emerald-100 border-dashed">
                           <span className="flex items-center gap-2"><Zap size={16}/> Potongan Promo</span>
                           <span>- Rp {fNum(checkout.finalDisc)}</span>
                         </div>
                       )}
                   </div>
                   
-                  <div className="mt-auto pt-6 border-t border-gray-200">
+                  <div className="mt-auto pt-6 border-t border-emerald-100">
                     <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Total Tagihan Pembeli</p>
                     <div className="mb-6">
                        <p className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tighter">Rp {fNum(checkout.total)}</p>
@@ -683,7 +703,7 @@ export default function App() {
         {page === 'prospect' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <div className="space-y-6 md:space-y-8">
-              <BentoCard>
+              <BentoCard accent="slate">
                 <SectionHeader icon={BarChart3} title="Data Historis" subtitle="Performa rata-rata bulan lalu." />
                 <div className="grid grid-cols-2 gap-4">
                   <MinimalInput label="Omset / Bln" prefix="Rp" value={histData.omset} onChange={(e) => handleHistChange('omset', e.target.value)} />
@@ -693,9 +713,9 @@ export default function App() {
                 </div>
               </BentoCard>
 
-              <BentoCard>
+              <BentoCard accent="emerald">
                 <SectionHeader icon={TrendingUp} title="Proyeksi Pertumbuhan" subtitle="Simulasi jika pesanan meningkat." />
-                <div className="bg-gray-50/80 border border-gray-100 p-6 md:p-8 rounded-[24px]">
+                <div className="bg-emerald-50/20 border border-emerald-100 p-6 md:p-8 rounded-[24px]">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Ekspektasi Order</span>
                     <span className="text-xl font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-[10px] border border-emerald-100">+{growthProj}%</span>
@@ -704,9 +724,9 @@ export default function App() {
                     type="range" min="0" max="200" step="5" value={growthProj} onChange={(e) => setGrowthProj(Number(e.target.value))}
                     className="bento-slider mb-8"
                   />
-                  <div className="mt-6 flex items-center justify-between pt-6 border-t border-gray-200">
+                  <div className="mt-6 flex items-center justify-between pt-6 border-t border-emerald-100 border-dashed">
                     <div className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Est. Trx Baru</div>
-                    <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2 rounded-[14px] shadow-sm">
+                    <div className="flex items-center gap-3 bg-white border border-emerald-100 px-4 py-2 rounded-[14px] shadow-sm">
                       <input type="text" inputMode="numeric" className="bg-transparent outline-none font-extrabold text-gray-900 text-2xl tabular-nums w-24 text-right" value={fNum(Math.round(pNum(histData.orders) * (1 + growthProj/100)))} onChange={(e) => handleTargetOrderChange(e.target.value)} />
                       <span className="text-sm font-semibold text-gray-500">Order</span>
                     </div>
@@ -717,7 +737,7 @@ export default function App() {
 
             <div className="space-y-6 md:space-y-8">
               {/* CURRENT VS FUTURE CARD */}
-              <BentoCard className="!p-0 border border-gray-200 overflow-hidden">
+              <BentoCard accent="slate" className="!p-0 border border-gray-200 overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
                   <div className="p-6 md:p-8 space-y-6 bg-gray-50/50">
                     <div className="inline-block border border-gray-200 text-gray-500 px-3 py-1 rounded-full bg-white"><p className="text-[10px] font-bold uppercase tracking-widest">Current (As Is)</p></div>
@@ -736,7 +756,7 @@ export default function App() {
                         <p className="text-[11px] font-semibold text-emerald-700/70 uppercase tracking-wider">Est. Biaya</p>
                         <div className="flex items-center bg-white border border-gray-200 shadow-sm rounded-[8px] px-2 py-0.5">
                            <input type="number" value={futureCostPct} onChange={(e) => setFutureCostPct(e.target.value)} className="bg-transparent text-gray-900 font-bold text-sm w-8 outline-none text-center" />
-                           <span className="text-[10px] font-medium text-gray-500">%</span>
+                           <span className="text-[10px] font-medium text-gray-400">%</span>
                         </div>
                       </div>
                       <p className="text-lg font-bold text-rose-500">Rp {fNum(projection.pInvestTotal)}</p>
@@ -746,13 +766,13 @@ export default function App() {
                 </div>
               </BentoCard>
 
-              <BentoCard highlighted={projection.pNet >= projection.hNet}>
+              <BentoCard accent="blue">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-[16px] bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-600"><Receipt size={20}/></div>
+                    <div className="w-12 h-12 rounded-[16px] bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600"><Receipt size={20}/></div>
                     <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest">Selisih Laba</h3>
                   </div>
-                  <span className={`text-xl font-extrabold px-5 py-2.5 rounded-[16px] ${projection.pNet >= projection.hNet ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                  <span className={`text-xl font-extrabold px-5 py-2.5 rounded-[16px] shadow-sm border ${projection.pNet >= projection.hNet ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
                     {projection.pNet >= projection.hNet ? '+' : ''}Rp {fNum(projection.pNet - projection.hNet)}
                   </span>
                 </div>
@@ -771,7 +791,7 @@ export default function App() {
               
               {/* Controls */}
               <div className="space-y-6 md:space-y-8">
-                <BentoCard>
+                <BentoCard accent="slate">
                   <SectionHeader icon={Megaphone} title="Model Iklan" subtitle="Pilih jenis penempatan Ads." />
                   <div className="space-y-3">
                     {[
@@ -781,7 +801,7 @@ export default function App() {
                     ].map(ad => {
                        const isSelected = adsType === ad.id;
                        return (
-                         <div key={ad.id} onClick={() => setAdsType(ad.id)} className={`p-4 rounded-[20px] cursor-pointer transition-all duration-300 flex items-center gap-4 border ${isSelected ? 'bg-emerald-50/50 border-emerald-500 shadow-sm ring-1 ring-emerald-500/10' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                         <div key={ad.id} onClick={() => setAdsType(ad.id)} className={`p-4 rounded-[20px] cursor-pointer transition-all duration-300 flex items-center gap-4 border ${isSelected ? 'bg-emerald-50/50 border-emerald-500 shadow-sm ring-1 ring-emerald-500/20' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-emerald-500' : 'border-gray-300'}`}>
                              {isSelected && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"/>}
                            </div>
@@ -795,7 +815,7 @@ export default function App() {
                   </div>
                 </BentoCard>
 
-                <BentoCard>
+                <BentoCard accent="slate">
                   <SectionHeader icon={Crosshair} title="Parameter Budget" subtitle="Atur dana dan rasio konversi." />
                   <div className="space-y-5">
                     <MinimalInput label="Budget Harian" prefix="Rp" value={adsBudget} onChange={(e) => setAdsBudget(e.target.value)} />
@@ -809,7 +829,7 @@ export default function App() {
                     )}
 
                     <div className="bg-blue-50 border border-blue-100 p-4 rounded-[16px] flex items-start gap-3 mt-4">
-                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 mt-0.5 text-blue-500"><Info size={12} strokeWidth={3} /></div>
+                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 mt-0.5 text-blue-500 shadow-sm"><Info size={12} strokeWidth={3} /></div>
                       <p className="text-[11px] text-blue-800 font-medium leading-relaxed">
                         {adsType === 'cpo' 
                           ? <>Anda hanya akan ditagih <b className="font-bold">Rp {cpcBid}</b> jika pesanan sukses terjadi.</>
@@ -823,7 +843,7 @@ export default function App() {
 
               {/* Visualization */}
               <div className="space-y-8">
-                <BentoCard className="h-full flex flex-col bg-emerald-50/30 !border-emerald-100 overflow-hidden relative">
+                <BentoCard accent="emerald" className="h-full flex flex-col bg-emerald-50/30 !border-emerald-500/20 overflow-hidden relative">
                     {/* Minimal decorative element */}
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full"></div>
 
@@ -836,7 +856,7 @@ export default function App() {
                        {/* Funnel Layout Minimalist */}
                        <div className="relative">
                           {/* Connector Line */}
-                          <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-emerald-200"></div>
+                          <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-emerald-200/50"></div>
                           
                           <div className="flex items-center gap-6 mb-8 relative z-10">
                             <div className="w-10 h-10 rounded-full bg-white border border-emerald-100 shadow-sm flex items-center justify-center shrink-0"><Eye size={16} className="text-gray-500"/></div>
@@ -852,7 +872,7 @@ export default function App() {
                               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Diklik (Traffic)</p>
                               <div className="flex items-center gap-3">
                                 <p className="text-2xl font-extrabold text-gray-900">{fNum(adsSim.estClicks)}</p>
-                                {adsType !== 'cpo' && <p className="text-[9px] text-blue-600 font-bold bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md">CTR {adsSim.ctrVal}%</p>}
+                                {adsType !== 'cpo' && <p className="text-[9px] text-blue-400 font-bold bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md shadow-sm">CTR {adsSim.ctrVal}%</p>}
                               </div>
                             </div>
                           </div>
@@ -863,7 +883,7 @@ export default function App() {
                               <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest mb-1">Dibeli (Order)</p>
                               <div className="flex items-center gap-3">
                                 <p className="text-3xl font-extrabold text-emerald-600">{fNum(adsSim.estOrders)}</p>
-                                {adsType !== 'cpo' && <p className="text-[9px] text-emerald-600 font-bold bg-emerald-100/50 border border-emerald-200 px-2 py-0.5 rounded-md">CVR {(adsSim.cvr * 100).toFixed(0)}%</p>}
+                                {adsType !== 'cpo' && <p className="text-[9px] text-emerald-600 font-bold bg-emerald-100/50 border border-emerald-200 px-2 py-0.5 rounded-md shadow-sm">CVR {(adsSim.cvr * 100).toFixed(0)}%</p>}
                               </div>
                             </div>
                           </div>
@@ -891,16 +911,16 @@ export default function App() {
             </div>
 
             {/* METRICS TABLE */}
-            <BentoCard>
+            <BentoCard accent="slate">
               <SectionHeader icon={BarChart} title="Panduan Diagnostik" subtitle="Standar metrik sehat di industri FnB." />
               <div className="overflow-x-auto hide-scrollbar pb-2 mt-4">
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr>
                       <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[180px] border-b border-gray-100">Metric</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[120px] border-b border-gray-100">Status</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[120px] border-b border-gray-100">Target</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest border-b border-gray-100">Saran Tindakan</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-[120px] border-b border-gray-100">Status</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-[120px] border-b border-gray-100">Target</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100">Saran Tindakan</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
