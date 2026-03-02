@@ -68,15 +68,15 @@ const MinimalInput = ({ label, value, onChange, prefix, suffix, type = "text" })
   <div className="w-full flex flex-col gap-2">
     {label && <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-1">{label}</label>}
     <div className="relative flex items-center bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-[16px] h-14 px-4 transition-all duration-200 focus-within:bg-white focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10">
-      {prefix && <span className="text-gray-400 font-medium mr-2">{prefix}</span>}
+      {prefix && <span className="text-gray-500 font-medium mr-2">{prefix}</span>}
       <input 
         type={type}
         inputMode={type === 'number' ? 'decimal' : 'numeric'}
-        className="flex-1 bg-transparent border-none outline-none text-gray-900 font-semibold text-base tabular-nums placeholder:text-gray-300 w-full"
+        className="flex-1 bg-transparent border-none outline-none text-gray-900 font-semibold text-base tabular-nums placeholder:text-gray-400 w-full"
         value={value}
         onChange={onChange}
       />
-      {suffix && <span className="text-gray-400 font-medium ml-2">{suffix}</span>}
+      {suffix && <span className="text-gray-500 font-medium ml-2">{suffix}</span>}
     </div>
   </div>
 );
@@ -242,10 +242,10 @@ export default function App() {
           <div className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity" onClick={() => setActiveModal(null)} />
           <div className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] z-10 animate-fade-in border border-gray-100">
             <div className="flex justify-between items-center mb-6">
-               <h3 className="font-bold text-xs uppercase tracking-widest text-gray-400">
+               <h3 className="font-bold text-xs uppercase tracking-widest text-gray-500">
                  {activeModal === 'cust' ? 'Struk Pelanggan' : 'Estimasi Net Resto'}
                </h3>
-               <button onClick={() => setActiveModal(null)} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors">✕</button>
+               <button onClick={() => setActiveModal(null)} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">✕</button>
             </div>
             
             <div className="space-y-4 font-medium text-gray-600">
@@ -271,7 +271,7 @@ export default function App() {
                     </div>
                   )}
                   <div className="flex justify-between pt-4 mt-4 border-t border-gray-100">
-                    <span className="text-xs uppercase tracking-wider text-gray-400">Marketing Invest.</span>
+                    <span className="text-xs uppercase tracking-wider text-gray-500">Marketing Invest.</span>
                     <span className="font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md text-xs">{calc.mexInvestPct.toFixed(1)}%</span>
                   </div>
                 </>
@@ -279,7 +279,7 @@ export default function App() {
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-100 bg-gray-50 -mx-8 -mb-8 p-8 rounded-b-[32px]">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                 {activeModal === 'cust' ? 'Total Dibayar Pembeli' : 'Diterima Resto (Net)'}
               </p>
               <p className={`text-4xl font-extrabold tracking-tight ${activeModal === 'cust' ? 'text-gray-900' : 'text-emerald-600'}`}>
@@ -291,38 +291,40 @@ export default function App() {
       )}
 
       {/* HEADER */}
-      <header className="relative z-40 px-6 py-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 mb-2">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-200/60 flex items-center justify-center">
-            <Calculator size={24} className="text-emerald-600" />
+      <header className="sticky top-0 z-50 bg-[#F8F9FA]/80 backdrop-blur-xl border-b border-gray-200/80 mb-6 md:mb-8 transition-all duration-300">
+        <div className="px-6 py-4 md:py-5 max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-200/60 flex items-center justify-center">
+              <Calculator size={24} className="text-emerald-600" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-gray-900 tracking-tight leading-none">GrabMerchant</h1>
+              <p className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider mt-1">Simulator Studio</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-gray-900 tracking-tight leading-none">GrabMerchant</h1>
-            <p className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider mt-1">Simulator Studio</p>
-          </div>
-        </div>
 
-        {/* Desktop Segmented Control */}
-        <div className="hidden md:flex bg-gray-200/50 p-1.5 rounded-full border border-gray-200/60 backdrop-blur-sm">
-          {[
-            { id: 'calc', label: 'Margin Menu' },
-            { id: 'checkout', label: 'Simulasi Cart' },
-            { id: 'prospect', label: 'Proyeksi' },
-            { id: 'ads', label: 'Iklan (Ads)' }
-          ].map(item => {
-             const isActive = page === item.id;
-             return (
-              <button 
-                key={item.id} onClick={() => setPage(item.id)}
-                className={`relative px-6 py-2.5 rounded-full text-[13px] font-bold transition-all duration-300 
-                  ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'}
-                `}
-              >
-                {item.label}
-                {item.id === 'checkout' && cart.length > 0 && <span className={`absolute top-2.5 right-3.5 w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>}
-              </button>
-             )
-          })}
+          {/* Desktop Segmented Control */}
+          <div className="hidden md:flex bg-gray-200/50 p-1.5 rounded-full border border-gray-200/60 backdrop-blur-sm">
+            {[
+              { id: 'calc', label: 'Margin Menu' },
+              { id: 'checkout', label: 'Simulasi Cart' },
+              { id: 'prospect', label: 'Proyeksi' },
+              { id: 'ads', label: 'Iklan (Ads)' }
+            ].map(item => {
+               const isActive = page === item.id;
+               return (
+                <button 
+                  key={item.id} onClick={() => setPage(item.id)}
+                  className={`relative px-6 py-2.5 rounded-full text-[13px] font-bold transition-all duration-300 
+                    ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'}
+                  `}
+                >
+                  {item.label}
+                  {item.id === 'checkout' && cart.length > 0 && <span className={`absolute top-2.5 right-3.5 w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>}
+                </button>
+               )
+            })}
+          </div>
         </div>
       </header>
 
@@ -340,7 +342,7 @@ export default function App() {
                <BentoCard className="flex flex-col text-left !p-6">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Harga App</p>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400"><Tags size={14}/></div>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500"><Tags size={14}/></div>
                   </div>
                   <p className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Rp {fNum(calc.list)}</p>
                </BentoCard>
@@ -381,7 +383,7 @@ export default function App() {
                       `}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <p className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-emerald-500' : 'text-gray-400'}`}>{s.subtitle}</p>
+                        <p className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-emerald-500' : 'text-gray-500'}`}>{s.subtitle}</p>
                         {isActive && <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center"><Check size={12} strokeWidth={3} className="text-white"/></div>}
                       </div>
                       <h3 className={`text-sm md:text-base font-extrabold tracking-tight ${isActive ? 'text-gray-900' : 'text-gray-600'}`}>{s.title}</h3>
@@ -433,11 +435,11 @@ export default function App() {
                       
                       <div className="mt-4 flex gap-3">
                          <div className="bg-white p-3 rounded-[16px] border border-gray-100 flex-1 shadow-sm">
-                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Diskon Promo</p>
+                           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Diskon Promo</p>
                            <p className="font-extrabold text-lg text-emerald-600 leading-none">{inputs.vDisk}%</p>
                          </div>
                          <div className="bg-white p-3 rounded-[16px] border border-gray-100 flex-1 shadow-sm">
-                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Beban Resto</p>
+                           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Beban Resto</p>
                            <p className="font-extrabold text-lg text-blue-600 leading-none">{inputs.mShare}%</p>
                          </div>
                       </div>
@@ -524,9 +526,9 @@ export default function App() {
             PAGE 2: CHECKOUT / CART
             ========================================= */}
         {page === 'checkout' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-stretch">
             
-            <div className="lg:col-span-7 space-y-6 md:space-y-8">
+            <div className="lg:col-span-7 flex flex-col gap-6 md:gap-8">
               <BentoCard>
                 <SectionHeader icon={Info} title="Opsi Pengiriman" subtitle="Kecepatan mempengaruhi harga ongkir." />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -560,15 +562,15 @@ export default function App() {
                 </div>
               </BentoCard>
 
-              <BentoCard>
-                <div className="flex justify-between items-center mb-6">
+              <BentoCard className="flex-1 flex flex-col">
+                <div className="flex justify-between items-center mb-6 shrink-0">
                   <SectionHeader icon={ShoppingBag} title="Keranjang Belanja" subtitle="Daftar menu yang telah disimulasikan." />
                   <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-[8px] text-[11px] font-bold">{cart.reduce((a,b)=>a+b.qty,0)} Items</span>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-3 flex-1">
                   {cart.length === 0 ? (
-                     <div className="py-12 flex flex-col items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-[20px]">
+                     <div className="py-12 flex flex-col items-center justify-center bg-gray-50 border border-dashed border-gray-200 rounded-[20px] h-full">
                         <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 text-gray-400"><ShoppingCart size={20} /></div>
                         <p className="text-gray-500 font-semibold text-xs uppercase tracking-widest">Keranjang Kosong</p>
                      </div>
@@ -595,8 +597,8 @@ export default function App() {
               </BentoCard>
             </div>
 
-            <div className="lg:col-span-5 space-y-6 md:space-y-8">
-               <BentoCard className="!p-0 z-20 overflow-visible">
+            <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8">
+               <BentoCard className="!p-0 z-20 overflow-visible shrink-0">
                   <div className="p-6 md:p-8">
                     <SectionHeader icon={Ticket} title="Promo & Voucher" subtitle="Terapkan skema diskon." />
                     <div className="relative">
@@ -608,7 +610,7 @@ export default function App() {
                             <p className={`text-[11px] font-medium mt-0.5 ${activeVoucher ? 'text-emerald-600' : 'text-gray-500'}`}>{activeVoucher ? activeVoucher.label : 'Makin hemat'}</p>
                           </div>
                         </div>
-                        <ChevronDown size={20} className={`transition-transform duration-300 ${showVoucherDropdown ? 'rotate-180' : ''} ${activeVoucher ? 'text-emerald-600' : 'text-gray-400'}`}/>
+                        <ChevronDown size={20} className={`transition-transform duration-300 ${showVoucherDropdown ? 'rotate-180' : ''} ${activeVoucher ? 'text-emerald-600' : 'text-gray-500'}`}/>
                       </button>
 
                       {showVoucherDropdown && (
@@ -648,25 +650,25 @@ export default function App() {
                   </div>
                </BentoCard>
 
-               <BentoCard className="bg-gray-900 text-white !border-gray-800 shadow-2xl flex flex-col h-full !p-6 md:!p-8">
+               <BentoCard className="flex-1 flex flex-col bg-gray-50/80 !border-gray-200">
                   <div className="space-y-4 mb-8 font-medium">
-                      <div className="flex justify-between text-sm text-gray-400"><span>Subtotal Menu</span><span className="text-white">Rp {fNum(checkout.subtotal)}</span></div>
-                      <div className="flex justify-between text-sm text-gray-400"><span>Ongkos Kirim</span><span className="text-white">Rp {fNum(checkout.finalOngkir)}</span></div>
-                      <div className="flex justify-between text-sm text-gray-400"><span>Biaya Platform</span><span className="text-white">Rp 1.500</span></div>
+                      <div className="flex justify-between text-sm text-gray-500"><span>Subtotal Menu</span><span className="text-gray-900 font-bold">Rp {fNum(checkout.subtotal)}</span></div>
+                      <div className="flex justify-between text-sm text-gray-500"><span>Ongkos Kirim</span><span className="text-gray-900 font-bold">Rp {fNum(checkout.finalOngkir)}</span></div>
+                      <div className="flex justify-between text-sm text-gray-500"><span>Biaya Platform</span><span className="text-gray-900 font-bold">Rp 1.500</span></div>
                       {checkout.finalDisc > 0 && (
-                        <div className="flex justify-between text-sm font-bold text-emerald-400 pt-5 border-t border-gray-800">
+                        <div className="flex justify-between text-sm font-bold text-emerald-600 pt-5 border-t border-gray-200">
                           <span className="flex items-center gap-2"><Zap size={16}/> Potongan Promo</span>
                           <span>- Rp {fNum(checkout.finalDisc)}</span>
                         </div>
                       )}
                   </div>
                   
-                  <div className="mt-auto pt-6 border-t border-gray-800">
-                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Total Tagihan Pembeli</p>
+                  <div className="mt-auto pt-6 border-t border-gray-200">
+                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Total Tagihan Pembeli</p>
                     <div className="mb-6">
-                       <p className="text-4xl md:text-5xl font-extrabold text-white tracking-tighter">Rp {fNum(checkout.total)}</p>
+                       <p className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tighter">Rp {fNum(checkout.total)}</p>
                     </div>
-                    <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-white p-4 rounded-[16px] font-bold text-sm uppercase tracking-widest transition-all active:scale-95 flex justify-center items-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.3)]">
+                    <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-[16px] font-bold text-sm uppercase tracking-widest transition-all active:scale-95 flex justify-center items-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.3)]">
                         Lanjut Pesan <ChevronRight size={18} strokeWidth={3} />
                     </button>
                   </div>
@@ -706,7 +708,7 @@ export default function App() {
                     <div className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Est. Trx Baru</div>
                     <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2 rounded-[14px] shadow-sm">
                       <input type="text" inputMode="numeric" className="bg-transparent outline-none font-extrabold text-gray-900 text-2xl tabular-nums w-24 text-right" value={fNum(Math.round(pNum(histData.orders) * (1 + growthProj/100)))} onChange={(e) => handleTargetOrderChange(e.target.value)} />
-                      <span className="text-sm font-semibold text-gray-400">Order</span>
+                      <span className="text-sm font-semibold text-gray-500">Order</span>
                     </div>
                   </div>
                 </div>
@@ -734,7 +736,7 @@ export default function App() {
                         <p className="text-[11px] font-semibold text-emerald-700/70 uppercase tracking-wider">Est. Biaya</p>
                         <div className="flex items-center bg-white border border-gray-200 shadow-sm rounded-[8px] px-2 py-0.5">
                            <input type="number" value={futureCostPct} onChange={(e) => setFutureCostPct(e.target.value)} className="bg-transparent text-gray-900 font-bold text-sm w-8 outline-none text-center" />
-                           <span className="text-[10px] font-medium text-gray-400">%</span>
+                           <span className="text-[10px] font-medium text-gray-500">%</span>
                         </div>
                       </div>
                       <p className="text-lg font-bold text-rose-500">Rp {fNum(projection.pInvestTotal)}</p>
@@ -821,67 +823,67 @@ export default function App() {
 
               {/* Visualization */}
               <div className="space-y-8">
-                <BentoCard className="h-full flex flex-col bg-gray-900 text-white !border-gray-800 overflow-hidden relative">
+                <BentoCard className="h-full flex flex-col bg-emerald-50/30 !border-emerald-100 overflow-hidden relative">
                     {/* Minimal decorative element */}
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full"></div>
 
                     <div className="flex items-center gap-4 mb-10 relative z-10">
-                      <div className="w-10 h-10 rounded-[12px] bg-gray-800 border border-gray-700 flex items-center justify-center"><Activity size={20} className="text-emerald-400" /></div>
-                      <span className="text-[11px] font-semibold uppercase tracking-widest text-gray-300">Estimasi Kinerja Harian</span>
+                      <div className="w-10 h-10 rounded-[12px] bg-white border border-emerald-100 shadow-sm flex items-center justify-center"><Activity size={20} className="text-emerald-500" /></div>
+                      <span className="text-[11px] font-semibold uppercase tracking-widest text-emerald-700">Estimasi Kinerja Harian</span>
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center space-y-10 pl-2 relative z-10">
                        {/* Funnel Layout Minimalist */}
                        <div className="relative">
                           {/* Connector Line */}
-                          <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gray-800"></div>
+                          <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-emerald-200"></div>
                           
                           <div className="flex items-center gap-6 mb-8 relative z-10">
-                            <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center shrink-0"><Eye size={16} className="text-gray-400"/></div>
+                            <div className="w-10 h-10 rounded-full bg-white border border-emerald-100 shadow-sm flex items-center justify-center shrink-0"><Eye size={16} className="text-gray-500"/></div>
                             <div>
                               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Dilihat (Tayangan)</p>
-                              <p className="text-2xl font-extrabold text-white">{fNum(adsSim.estImpressions)}</p>
+                              <p className="text-2xl font-extrabold text-gray-900">{fNum(adsSim.estImpressions)}</p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-6 mb-8 relative z-10">
-                            <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center shrink-0"><MousePointer2 size={16} className="text-blue-400"/></div>
+                            <div className="w-10 h-10 rounded-full bg-white border border-emerald-100 shadow-sm flex items-center justify-center shrink-0"><MousePointer2 size={16} className="text-blue-500"/></div>
                             <div>
                               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Diklik (Traffic)</p>
                               <div className="flex items-center gap-3">
-                                <p className="text-2xl font-extrabold text-white">{fNum(adsSim.estClicks)}</p>
-                                {adsType !== 'cpo' && <p className="text-[9px] text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md">CTR {adsSim.ctrVal}%</p>}
+                                <p className="text-2xl font-extrabold text-gray-900">{fNum(adsSim.estClicks)}</p>
+                                {adsType !== 'cpo' && <p className="text-[9px] text-blue-600 font-bold bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md">CTR {adsSim.ctrVal}%</p>}
                               </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-6 relative z-10">
-                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)]"><ShoppingBag size={16} className="text-white"/></div>
+                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-[0_4px_10px_rgba(16,185,129,0.3)]"><ShoppingBag size={16} className="text-white"/></div>
                             <div>
-                              <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest mb-1">Dibeli (Order)</p>
+                              <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-widest mb-1">Dibeli (Order)</p>
                               <div className="flex items-center gap-3">
-                                <p className="text-3xl font-extrabold text-emerald-400">{fNum(adsSim.estOrders)}</p>
-                                {adsType !== 'cpo' && <p className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">CVR {(adsSim.cvr * 100).toFixed(0)}%</p>}
+                                <p className="text-3xl font-extrabold text-emerald-600">{fNum(adsSim.estOrders)}</p>
+                                {adsType !== 'cpo' && <p className="text-[9px] text-emerald-600 font-bold bg-emerald-100/50 border border-emerald-200 px-2 py-0.5 rounded-md">CVR {(adsSim.cvr * 100).toFixed(0)}%</p>}
                               </div>
                             </div>
                           </div>
                        </div>
                     </div>
 
-                    <div className="mt-10 pt-8 border-t border-gray-800 relative z-10">
+                    <div className="mt-10 pt-8 border-t border-emerald-100 relative z-10">
                       <div className="flex justify-between items-end mb-5">
                         <div>
                           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Total Biaya Ads</p>
-                          <p className="text-lg font-bold text-rose-400">Rp {fNum(adsSim.actualCost)}</p>
+                          <p className="text-lg font-bold text-rose-500">Rp {fNum(adsSim.actualCost)}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-1">Potensi Omset</p>
-                          <p className="text-xl font-extrabold text-white">Rp {fNum(adsSim.estGrossSales)}</p>
+                          <p className="text-xl font-extrabold text-gray-900">Rp {fNum(adsSim.estGrossSales)}</p>
                         </div>
                       </div>
-                      <div className="bg-gray-800/50 border border-gray-700 p-4 rounded-[16px] flex justify-between items-center">
-                        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">Return on Ad Spend</span>
-                        <span className={`text-lg font-extrabold ${adsSim.roas >= 5 ? 'text-emerald-400' : adsSim.roas >= 3 ? 'text-blue-400' : 'text-rose-400'}`}>{adsSim.roas.toFixed(1)}x ROAS</span>
+                      <div className="bg-white border border-emerald-100 p-4 rounded-[16px] flex justify-between items-center shadow-sm">
+                        <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">Return on Ad Spend</span>
+                        <span className={`text-lg font-extrabold ${adsSim.roas >= 5 ? 'text-emerald-600' : adsSim.roas >= 3 ? 'text-blue-500' : 'text-rose-500'}`}>{adsSim.roas.toFixed(1)}x ROAS</span>
                       </div>
                     </div>
                 </BentoCard>
@@ -895,10 +897,10 @@ export default function App() {
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-[180px] border-b border-gray-100">Metric</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-[120px] border-b border-gray-100">Status</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-[120px] border-b border-gray-100">Target</th>
-                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100">Saran Tindakan</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[180px] border-b border-gray-100">Metric</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[120px] border-b border-gray-100">Status</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest w-[120px] border-b border-gray-100">Target</th>
+                      <th className="pb-4 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-widest border-b border-gray-100">Saran Tindakan</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
